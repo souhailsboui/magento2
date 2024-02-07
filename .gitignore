@@ -1,1 +1,4 @@
-src/
+src/*
+!src/app/code
+!src/composer.json
+!src/composer.lock
