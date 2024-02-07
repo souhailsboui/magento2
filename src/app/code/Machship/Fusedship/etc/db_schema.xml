@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="fusedship_sales_order" engine="innodb" comment="Sales orders">
+        <!-- The standard auto-incrementing id of the table. -->
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+
+        <!-- The reference to the order id. -->
+        <column xsi:type="int" name="order_id" padding="10" unsigned="true" nullable="false" comment="Order id"/>
+
+        <!-- The column we want to create is a json field for a Fusedship Origin. -->
+        <column xsi:type="longtext" name="fusedship_origin" comment="Fusedship Origin" nullable="true"/>
+
+        <!-- The column we want to create is a json field for a Fusedship Destination. -->
+        <column xsi:type="longtext" name="fusedship_destination" comment="Fusedship Destination" nullable="true"/>
+
+        <!-- The column we want to create is a json field for a Fusedship Order Items. -->
+        <column xsi:type="longtext" name="fusedship_order_items" comment="Fusedship Order Items" nullable="true"/>
+
+        <column xsi:type="tinyint" name="fusedship_is_residential" nullable="true" comment="Fusedship is residential address type or not" />
+
+        <!-- This is the primary key constraint for the database table. -->
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+
+        <!-- Create a foreign key constraint to the related table to be related, which in this case is sales_order. -->
+        <constraint xsi:type="foreign" referenceId="MACHSHIP_FUSEDSHIP_SALES_ORDER_ORDER_ID_SALES_ORDER_ENTITY_ID" table="fusedship_sales_order" column="order_id" referenceTable="sales_order" referenceColumn="entity_id" onDelete="CASCADE"/>
+    </table>
+</schema>

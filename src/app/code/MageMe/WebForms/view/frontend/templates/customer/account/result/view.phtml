@@ -1,0 +1,47 @@
+<div class="dashboard">
+    <?php
+    /** @var View $block */
+
+    use MageMe\WebForms\Block\Customer\Account\Result\View;
+    use MageMe\WebForms\Config\Options\Result\Permission;
+
+    $result = $block->getResult();
+    $date   = $block->formatDate($result->getCreatedAt(), IntlDateFormatter::MEDIUM, true);
+
+    if ($result->getId()) {
+        ?>
+        <div id="mm-messages">
+            <div class="box-account webforms-customer-account-message result">
+
+                <div class="block">
+
+                    <div class="block-content">
+                        <div class="webforms-results">
+                            <div class="webforms-results-block">
+                                <?= $result->toHtml(['template' => 'result/view.phtml', 'header' => false]); ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="block-bottom">
+                        <?= __('You wrote on %1', $date) ?>
+                    </div>
+                </div>
+            </div>
+
+            <?= $block->getMessages() ?>
+        </div>
+
+        <?php if (in_array(Permission::REPLY, $result->getForm()->getCustomerResultPermissionsByResult($result))) {
+            echo $block->getMessageForm();
+        } ?>
+
+
+        <div class="actions-toolbar">
+            <div class="secondary">
+                <a class="action back"
+                   href="javascript:window.history.back()"><span><?= __('Back') ?></span></a>
+            </div>
+        </div>
+    <?php } ?>
+</div>

@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Mageplaza
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Mageplaza.com license that is
+ * available through the world-wide-web at this URL:
+ * https://www.mageplaza.com/LICENSE.txt
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Mageplaza
+ * @package     Mageplaza_StoreCredit
+ * @copyright   Copyright (c) Mageplaza (https://www.mageplaza.com/)
+ * @license     https://www.mageplaza.com/LICENSE.txt
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+  <table name="mageplaza_store_credit_customer" resource="default" engine="innodb" comment="Mageplaza Store Credit Customer">
+    <column xsi:type="int" name="customer_id" padding="10" unsigned="true" nullable="false" identity="false" default="0" comment="Customer Id"/>
+    <column xsi:type="decimal" name="mp_credit_balance" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Store Credit Balance"/>
+    <column xsi:type="smallint" name="mp_credit_notification" padding="6" unsigned="false" nullable="false" identity="false" comment="Notification Update"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="customer_id"/>
+    </constraint>
+    <constraint xsi:type="foreign" referenceId="MAGEPLAZA_STORE_CREDIT_CSTR_CSTR_ID_CSTR_ENTT_ENTT_ID" table="mageplaza_store_credit_customer" column="customer_id" referenceTable="customer_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+  </table>
+  <table name="mageplaza_store_credit_transaction" resource="default" engine="innodb" comment="Mageplaza Store Credit Transaction">
+    <column xsi:type="int" name="transaction_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Store Credit Id"/>
+    <column xsi:type="int" name="customer_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Credit Id"/>
+    <column xsi:type="int" name="order_id" padding="11" unsigned="false" nullable="false" identity="false" comment="Order Id"/>
+    <column xsi:type="varchar" name="title" nullable="false" length="255" comment="Title"/>
+    <column xsi:type="smallint" name="status" padding="6" unsigned="false" nullable="false" identity="false" default="0" comment="Status"/>
+    <column xsi:type="varchar" name="action" nullable="false" length="255" comment="Action"/>
+    <column xsi:type="decimal" name="amount" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Amount"/>
+    <column xsi:type="decimal" name="balance" scale="4" precision="12" unsigned="false" nullable="false" default="0" comment="Balance"/>
+    <column xsi:type="mediumtext" name="customer_note" nullable="true" comment="Customer Note"/>
+    <column xsi:type="mediumtext" name="admin_note" nullable="true" comment="Admin Note"/>
+    <column xsi:type="timestamp" name="created_at" on_update="false" nullable="true" default="CURRENT_TIMESTAMP" comment="Created At"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="transaction_id"/>
+    </constraint>
+    <constraint xsi:type="foreign" referenceId="MAGEPLAZA_STORE_CREDIT_TRANSACTION_CSTR_ID_CSTR_ENTT_ENTT_ID" table="mageplaza_store_credit_transaction" column="customer_id" referenceTable="customer_entity" referenceColumn="entity_id" onDelete="CASCADE"/>
+  </table>
+  <table name="quote" resource="default" engine="innodb">
+    <column xsi:type="decimal" name="mp_store_credit_spent" scale="4" precision="12" unsigned="false" nullable="true" comment="Mp Store Credit Spent"/>
+    <column xsi:type="decimal" name="mp_store_credit_discount" scale="4" precision="12" unsigned="false" nullable="true" comment="Mp Store Credit Spent"/>
+    <column xsi:type="decimal" name="mp_store_credit_base_discount" scale="4" precision="12" unsigned="false" nullable="true" comment="Mp Store Credit Base Discount"/>
+    <column xsi:type="text" name="mp_store_credit_extra_content" nullable="true" comment="Mp Store Credit Base Discount"/>
+  </table>
+  <table name="sales_order" resource="default" engine="innodb">
+    <column xsi:type="decimal" name="mp_store_credit_discount" scale="4" precision="12" unsigned="false" nullable="true" comment="Mp Store Credit Discount"/>
+    <column xsi:type="decimal" name="mp_store_credit_base_discount" scale="4" precision="12" unsigned="false" nullable="true" comment="Mp Store Credit Base Discount"/>
+    <column xsi:type="text" name="mp_store_credit_extra_content" nullable="true" comment="Mp Store Credit Base Discount"/>
+  </table>
+  <table name="sales_invoice" resource="default" engine="innodb">
+    <column xsi:type="decimal" name="mp_store_credit_discount" scale="4" precision="12" unsigned="false" nullable="true" comment="Mp Store Credit Discount"/>
+    <column xsi:type="decimal" name="mp_store_credit_base_discount" scale="4" precision="12" unsigned="false" nullable="true" comment="Mp Store Credit Base Discount"/>
+  </table>
+  <table name="sales_creditmemo" resource="default" engine="innodb">
+    <column xsi:type="decimal" name="mp_store_credit_discount" scale="4" precision="12" unsigned="false" nullable="true" comment="Mp Store Credit Discount"/>
+    <column xsi:type="decimal" name="mp_store_credit_base_discount" scale="4" precision="12" unsigned="false" nullable="true" comment="Mp Store Credit Base Discount"/>
+  </table>
+
+</schema>

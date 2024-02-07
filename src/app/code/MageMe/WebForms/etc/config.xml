@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <webforms>
+            <general>
+                <admin_toolbar>1</admin_toolbar>
+                <ajax>1</ajax>
+                <preview_enabled>1</preview_enabled>
+                <customer_navigation_block_title><![CDATA[WebForms]]></customer_navigation_block_title>
+                <use_uid>1</use_uid>
+                <collect_customer_ip>0</collect_customer_ip>
+                <result_allowed_statuses>-1,0,1</result_allowed_statuses>
+            </general>
+            <statistics>
+                <enable>0</enable>
+                <cron_enable>0</cron_enable>
+                <show_null_stats>0</show_null_stats>
+                <show_unread_badge>1</show_unread_badge>
+                <enabled_stats>result_all,result_unread,result_replied,result_follow_up</enabled_stats>
+            </statistics>
+            <message>
+                <files_purge_enable>1</files_purge_enable>
+                <files_purge_period>14</files_purge_period>
+            </message>
+            <results>
+                <fieldname_display_limit>25</fieldname_display_limit>
+            </results>
+            <files>
+                <load_jquery>1</load_jquery>
+                <upload_limit>5000</upload_limit>
+            </files>
+            <images>
+                <cache>1</cache>
+                <upload_limit>1000</upload_limit>
+                <grid_thumbnail_width>100</grid_thumbnail_width>
+                <email_thumbnail_width>200</email_thumbnail_width>
+            </images>
+            <captcha>
+                <mode>off</mode>
+                <type>recaptcha</type>
+                <recaptcha>
+                    <private_key backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+                    <public_key backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+                    <private_key3 backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+                    <public_key3 backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+                    <theme>standard</theme>
+                    <recaptcha_version>2</recaptcha_version>
+                    <score_threshold>0.5</score_threshold>
+                    <validation_failure_message>reCAPTCHA verification failed.</validation_failure_message>
+                    <technical_failure_message>Something went wrong with reCAPTCHA. Please contact the store owner.</technical_failure_message>
+                </recaptcha>
+                <hcaptcha>
+                    <private_key backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+                    <public_key backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+                    <theme>light</theme>
+                    <score_threshold>0.5</score_threshold>
+                    <validation_failure_message>hCAPTCHA verification failed.</validation_failure_message>
+                    <technical_failure_message>Something went wrong with hCAPTCHA. Please contact the store owner.</technical_failure_message>
+                </hcaptcha>
+                <turnstile>
+                    <private_key backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+                    <public_key backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+                    <theme>auto</theme>
+                    <validation_failure_message>Turnstile verification failed.</validation_failure_message>
+                    <technical_failure_message>Something went wrong with Turnstile. Please contact the store owner.</technical_failure_message>
+                </turnstile>
+            </captcha>
+            <map>
+                <google_api_key backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+            </map>
+            <slideout>
+                <enable>0</enable>
+                <slider_position>right</slider_position>
+                <button_text>Contact us</button_text>
+                <button_color>#1979c3</button_color>
+                <button_text_color>#ffffff</button_text_color>
+                <button_width>25</button_width>
+                <background_color>#ffffff</background_color>
+                <border_color>#c6c6c6</border_color>
+                <form_width>350</form_width>
+                <form_margin_bottom>0</form_margin_bottom>
+            </slideout>
+        </webforms>
+    </default>
+</config>

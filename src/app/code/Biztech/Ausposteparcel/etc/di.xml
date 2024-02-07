@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="../../../../../lib/internal/Magento/Framework/ObjectManager/etc/config.xsd">
+    <type name="Magento\Checkout\Block\Checkout\LayoutProcessor">
+        <plugin name="validate-address" type="Biztech\Ausposteparcel\Plugin\Checkout\LayoutProcessorPlugin" sortOrder="10"/>
+    </type>
+
+    <preference for="Magento\Checkout\Block\Cart\LayoutProcessor" type="Biztech\Ausposteparcel\Block\Checkout\LayoutProcessor" />
+    <preference for="Magento\Sales\Controller\Adminhtml\Order\AddressSave" type="Biztech\Ausposteparcel\Controller\Adminhtml\Order\AddressSave"></preference>
+</config>

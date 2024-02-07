@@ -1,0 +1,32 @@
+/**
+ * Mageplaza
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Mageplaza.com license that is
+ * available through the world-wide-web at this URL:
+ * https://www.mageplaza.com/LICENSE.txt
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Mageplaza
+ * @package     Mageplaza_ZohoCRM
+ * @copyright   Copyright (c) Mageplaza (https://www.mageplaza.com/)
+ * @license     https://www.mageplaza.com/LICENSE.txt
+ */
+
+.admin__scope-old .rule-param-edit .element input.input-date+.ui-datepicker-trigger,
+.admin__scope-old .rule-param-edit .element input.input-date[readonly]+.ui-datepicker-trigger {
+    width: 155px;
+}
+
+#mp_mapping tr th{padding: 20px 30px;}
+#mp_mapping tr td {padding: 15px 40px;}
+.mp-field-comment{position: absolute;font-size: 12px}
+span.mp-zoho-on-click {
+    cursor: pointer;
+    color: #0a6c9f;
+}

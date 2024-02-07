@@ -1,0 +1,46 @@
+<?php
+
+/** @var $block RefreshToken */
+
+use MageMe\WebFormsZoho\Block\Adminhtml\System\RefreshToken;
+
+?>
+<?php if ($block->isConfigured()) { ?>
+    <button class="scalable" type="button" id="<?= $block->getHtmlId() ?>_button" onclick="generateToken()" style="margin-top: 1rem;">
+        <span><?= __('Generate Token') ?></span>
+    </button>
+
+    <script>
+        function generateToken() {
+            const url = "<?= $block->getAjaxUrl(); ?>";
+            const button = document.getElementById("<?= $block->getHtmlId() ?>_button");
+            const input = document.getElementById("<?= $block->getHtmlId() ?>");
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', url, true);
+            xhr.responseType = 'json';
+            xhr.upload.onloadstart = () => {
+                button.setAttribute('disabled', 'disabled');
+            }
+            xhr.onloadend = () => {
+                button.removeAttribute('disabled');
+            }
+            xhr.onload = () => {
+                if (xhr.status !== 200) {
+                    return alert(xhr.statusText);
+                }
+                if (!xhr.response) {
+                    return alert("<?= __('Unexpected error'); ?>");
+                }
+                if (!xhr.response['success']) {
+                    return alert(xhr.response['message'])
+                }
+                input.value = xhr.response['token'];
+            }
+            let data = new FormData();
+            data.append("isAjax", "true");
+            data.append('form_key', window.FORM_KEY);
+            xhr.send(data);
+        }
+    </script>
+<?php } ?>
+

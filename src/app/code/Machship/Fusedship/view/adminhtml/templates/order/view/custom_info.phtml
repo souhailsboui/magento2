@@ -1,0 +1,39 @@
+<?php
+$order = $block->getOrder();
+$orderId = $order->getId();
+
+$fusedshipSalesOrder = $block->getFusedshipSalesOrder($orderId);
+
+$addressTypes = ['Business', 'Residential'];
+if (!empty($fusedshipSalesOrder) && !is_null($fusedshipSalesOrder[0]['fusedship_is_residential'])) {
+?>
+<section class="admin__page-section" style="display:none;">
+    <div class="admin__page-section-content">
+        <div class="admin__page-section-item">
+            <div class="admin__page-section-item-title">
+                <span class="title">Other Information</span>
+            </div>
+            <div class="admin__page-section-item-content">
+                <strong>Address Type : </strong>
+                <span class="fusedship-address-type"><?php echo $addressTypes[$fusedshipSalesOrder[0]['fusedship_is_residential']]; ?></span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    require(['jquery'], function($) {
+        $(function() {
+            var addressType = $('.fusedship-address-type').html();
+
+            if (addressType) {
+                $('.admin__page-section-item.order-shipping-method')
+                    .find('.admin__page-section-item-content')
+                    .append("<p style='margin-top: 10px;'><strong>Address type:</strong> " + addressType + "</p>");
+            }
+        });
+    });
+</script>
+<?php
+}
+?>

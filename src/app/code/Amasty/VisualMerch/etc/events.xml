@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Visual Merchandiser for Magento 2
+ */-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="catalog_category_save_before">
+        <observer name="category_save_merchandiser_data" disabled="true"/>
+    </event>
+    <event name="catalog_category_save_after">
+        <observer name="Amasty_VisualMerch::category-after-save" instance="Amasty\VisualMerch\Observer\CatalogCategorySaveAfter"/>
+    </event>
+
+    <event name="catalog_product_save_commit_after">
+        <observer name="Amasty_VisualMerch::ReindexProduct"
+                  instance="Amasty\VisualMerch\Observer\DynamicCategory\ReindexProduct" />
+    </event>
+    <event name="catalog_category_save_commit_after">
+        <observer name="Amasty_VisualMerch::ReindexCategory"
+                  instance="Amasty\VisualMerch\Observer\DynamicCategory\ReindexCategory" />
+    </event>
+</config>

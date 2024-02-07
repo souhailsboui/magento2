@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Mageplaza
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Mageplaza.com license that is
+ * available through the world-wide-web at this URL:
+ * https://www.mageplaza.com/LICENSE.txt
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Mageplaza
+ * @package     Mageplaza_ZohoCRM
+ * @copyright   Copyright (c) Mageplaza (https://www.mageplaza.com/)
+ * @license     https://www.mageplaza.com/LICENSE.txt
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+  <table name="mageplaza_zoho_sync" resource="default" engine="innodb" comment="Mageplaza Zoho Sync">
+    <column xsi:type="int" name="sync_id" padding="10" unsigned="true" nullable="false" identity="true" comment="sync_id"/>
+    <column xsi:type="varchar" name="name" nullable="false" length="255" comment="Name"/>
+    <column xsi:type="varchar" name="magento_object" nullable="false" length="255" comment="Magento Object"/>
+    <column xsi:type="varchar" name="zoho_module" nullable="false" length="255" comment="Zoho Module"/>
+    <column xsi:type="varchar" name="website_ids" nullable="false" length="255" comment="Website Ids"/>
+    <column xsi:type="smallint" name="status" padding="6" unsigned="false" nullable="false" identity="false" comment="Status"/>
+    <column xsi:type="varchar" name="pending_queue" nullable="false" length="255" comment="Pending Queue"/>
+    <column xsi:type="text" name="mapping" nullable="false" comment="Mapping"/>
+    <column xsi:type="mediumtext" name="conditions_serialized" nullable="true" comment="Conditions_serialized"/>
+    <column xsi:type="int" name="priority" padding="10" unsigned="true" nullable="false" identity="false" default="0" comment="Priority"/>
+    <column xsi:type="timestamp" name="created_at" on_update="false" nullable="true" default="CURRENT_TIMESTAMP" comment="Created At"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="sync_id"/>
+    </constraint>
+  </table>
+  <table name="mageplaza_zoho_queue" resource="default" engine="innodb" comment="Mageplaza Zoho Queue">
+    <column xsi:type="int" name="queue_id" padding="10" unsigned="true" nullable="false" identity="true" comment="queue_id"/>
+    <column xsi:type="varchar" name="object" nullable="false" length="255" comment="Object"/>
+    <column xsi:type="int" name="sync_id" padding="10" unsigned="true" nullable="false" identity="false" comment="sync_id"/>
+    <column xsi:type="varchar" name="magento_object" nullable="false" length="255" comment="Magento Object"/>
+    <column xsi:type="varchar" name="zoho_module" nullable="false" length="255" comment="Zoho Module"/>
+    <column xsi:type="varchar" name="website" nullable="false" length="255" comment="Website"/>
+    <column xsi:type="varchar" name="action" nullable="false" length="255" comment="Action"/>
+    <column xsi:type="smallint" name="status" padding="6" unsigned="false" nullable="false" identity="false" comment="Status"/>
+    <column xsi:type="smallint" name="total_sync" padding="6" unsigned="false" nullable="false" identity="false" comment="Total Sync"/>
+    <column xsi:type="timestamp" name="created_at" on_update="false" nullable="true" default="CURRENT_TIMESTAMP" comment="Created At"/>
+    <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="true" default="CURRENT_TIMESTAMP" comment="Updated At"/>
+    <column xsi:type="text" name="json_response" nullable="false" comment="json Response"/>
+    <column xsi:type="varchar" name="object_name" nullable="true" length="255" comment="Object Name"/>
+    <column xsi:type="varchar" name="sync_name" nullable="true" length="255" comment="Sync Name"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="queue_id"/>
+    </constraint>
+    <constraint xsi:type="foreign" referenceId="MAGEPLAZA_ZOHO_QUEUE_SYNC_ID_MAGEPLAZA_ZOHO_SYNC_SYNC_ID" table="mageplaza_zoho_queue" column="sync_id" referenceTable="mageplaza_zoho_sync" referenceColumn="sync_id" onDelete="CASCADE"/>
+  </table>
+  <table name="sales_order" resource="default">
+    <column xsi:type="text" name="zoho_entity" nullable="true" comment="Zoho Entity"/>
+  </table>
+  <table name="sales_invoice" resource="default">
+    <column xsi:type="text" name="zoho_entity" nullable="true" comment="Zoho Entity"/>
+  </table>
+  <table name="customer_entity" resource="default">
+    <column xsi:type="text" name="zoho_entity" nullable="true" comment="Zoho Entity"/>
+    <column xsi:type="text" name="zoho_lead_entity" nullable="true" comment="Zoho Lead Entity"/>
+    <column xsi:type="text" name="zoho_contact_entity" nullable="true" comment="Zoho Contact Entity"/>
+  </table>
+  <table name="catalog_product_entity" resource="default">
+    <column xsi:type="text" name="zoho_entity" nullable="true" comment="Zoho Entity"/>
+  </table>
+  <table name="catalogrule" resource="default">
+    <column xsi:type="text" name="zoho_entity" nullable="true" comment="Zoho Entity"/>
+  </table>
+</schema>

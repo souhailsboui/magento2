@@ -1,0 +1,19 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Advanced Reports Base for Magento 2
+ */
+/** @var \Magento\Backend\Block\Template $block */
+
+// phpcs:disable Generic.Files.LineLength
+?>
+<div class="amreport-additional-info">
+<?= $block->escapeHtml(
+    __(
+        'To get more relevant and accurate results please refresh Amasty Customers Report statistics <a href="%1" target="_blank">here</a>.',
+        $block->getUrl('reports/report_statistics/index')
+    ),
+    ['a']
+) ?>
+</div>

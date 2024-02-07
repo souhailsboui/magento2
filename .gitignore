@@ -1,4 +1,8 @@
 src/*
-!src/app/code
+!src/app/
+src/app/*
+!src/app/code/
+!src/app/code/*
 !src/composer.json
 !src/composer.lock
+!src/auth.json

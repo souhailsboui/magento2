@@ -1,0 +1,292 @@
+"Are you sure you want to do this?","Are you sure you want to do this?"
+"Add To Zoho Queue","Add To Zoho Queue"
+Account,Account
+Lead,Lead
+Contact,Contact
+"As ","As "
+"Add To Zoho Queue As ","Add To Zoho Queue As "
+"Synchronize failed.","Synchronize failed."
+"Estimate synchronize failed.","Estimate synchronize failed."
+"A total of #1 record(s) have been synchronized. Note that in case there have already 5 times failed, it is unable to synchronize more. Please edit the object data, save and check again. ","A total of #1 record(s) have been synchronized. Note that in case there have already 5 times failed, it is unable to synchronize more. Please edit the object data, save and check again. "
+Next,Next
+"Back To Grid","Back To Grid"
+"Save and Continue Edit","Save and Continue Edit"
+"Conditions (don't add conditions if rule is applied to all object)","Conditions (don't add conditions if rule is applied to all object)"
+Conditions,Conditions
+"Please select","Please select"
+Name,Name
+Status,Status
+"Magento Object","Magento Object"
+"Zoho Module","Zoho Module"
+Website,Website
+Priority,Priority
+"If several rule meet the condition, the one with the highest priority will be applied. Smaller number means higher priority.","If several rule meet the condition, the one with the highest priority will be applied. Smaller number means higher priority."
+"Sync information","Sync information"
+ID,ID
+Object,Object
+Events,Events
+"Created On","Created On"
+"Updated On","Updated On"
+Error,Error
+Success,Success
+Pending,Pending
+"Mapping Fields","Mapping Fields"
+"Queue Report","Queue Report"
+"Pending Requests","Pending Requests"
+"Total Objects","Total Objects"
+"Total Requests","Total Requests"
+"Zoho Entity","Zoho Entity"
+"Zoho CRM","Zoho CRM"
+"Zoho Lead Entity","Zoho Lead Entity"
+"Zoho Contact Entity","Zoho Contact Entity"
+"Synchronization Information","Synchronization Information"
+"Get Access Token","Get Access Token"
+"A total of %1 record(s) have been added.","A total of %1 record(s) have been added."
+"Add to Zoho queue success.","Add to Zoho queue success."
+"Synchronization rule cannot be matched.","Synchronization rule cannot be matched."
+"Zoho Entity is exist.","Zoho Entity is exist."
+"Invalid object.","Invalid object."
+"Manage Sync Rules","Manage Sync Rules"
+"This item does not exists.","This item does not exists."
+"Data not found when trying to synchronize.","Data not found when trying to synchronize."
+"Please select type sync.","Please select type sync."
+"Manage Queue","Manage Queue"
+"A total of %1 record(s) have been deleted.","A total of %1 record(s) have been deleted."
+"Sync rule not found","Sync rule not found"
+"The sync rule has been deleted successfully.","The sync rule has been deleted successfully."
+"An error occurred while deleting the sync rule.","An error occurred while deleting the sync rule."
+"Edit Synchronization Rule #%1","Edit Synchronization Rule #%1"
+"Create Synchronization Rule","Create Synchronization Rule"
+"Manage Synchronization Rules","Manage Synchronization Rules"
+"A total of %1 record(s) have been updated.","A total of %1 record(s) have been updated."
+"Save rule success!","Save rule success!"
+"'An error occurred while saving the sync. Please try again later.' .","'An error occurred while saving the sync. Please try again later.' ."
+"Please fill Authorized redirect URIs","Please fill Authorized redirect URIs"
+"The Access Token has been saved successfully. You can close this window, then clean cache and refresh configuration page.","The Access Token has been saved successfully. You can close this window, then clean cache and refresh configuration page."
+"Invalid access token. Please try again!","Invalid access token. Please try again!"
+"Grant token not found!","Grant token not found!"
+"Cannot refresh access token.","Cannot refresh access token."
+"Accept %1 value.","Accept %1 value."
+"Select Date","Select Date"
+"Insert Variable...","Insert Variable..."
+"Product Category","Product Category"
+"Product Code","Product Code"
+"Product Active","Product Active"
+"Product Name","Product Name"
+"Sales Start Date","Sales Start Date"
+"Sales End Date","Sales End Date"
+"Support Start Date","Support Start Date"
+"Support End Date","Support End Date"
+Manufacturer,Manufacturer
+"Unit Price","Unit Price"
+Taxable,Taxable
+Tax,Tax
+"Commission Rate","Commission Rate"
+"Usage Unit","Usage Unit"
+"Quantity in Stock","Quantity in Stock"
+"Qty Ordered","Qty Ordered"
+"Reorder Level","Reorder Level"
+"Qty In Demand","Qty In Demand"
+Description,Description
+"Campaign Name","Campaign Name"
+"Start Date","Start Date"
+"End Date","End Date"
+"Expected Revenue","Expected Revenue"
+"Budgeted Cost","Budgeted Cost"
+"Actual Cost","Actual Cost"
+"Expected Response","Expected Response"
+"Numbers sent","Numbers sent"
+"Account Name","Account Name"
+"Account Number","Account Number"
+"Account Site","Account Site"
+"Parent Account","Parent Account"
+"Account Type","Account Type"
+Industry,Industry
+"Annual Revenue","Annual Revenue"
+Phone,Phone
+Fax,Fax
+"Ticker Symbol","Ticker Symbol"
+Ownership,Ownership
+Employees,Employees
+"SIC Code","SIC Code"
+"Billing Street","Billing Street"
+"Billing City","Billing City"
+"Billing Code","Billing Code"
+"Billing Country","Billing Country"
+"Billing State","Billing State"
+"Shipping Street","Shipping Street"
+"Shipping City","Shipping City"
+"Shipping State","Shipping State"
+"Shipping Code","Shipping Code"
+"Shipping Country","Shipping Country"
+Email,Email
+"First Name","First Name"
+"Last Name","Last Name"
+Mobile,Mobile
+Department,Department
+"Other Phone","Other Phone"
+Assistant,Assistant
+"Lead Source","Lead Source"
+Title,Title
+"Home Phone","Home Phone"
+"Date of Birth","Date of Birth"
+"Asst Phone","Asst Phone"
+"Email Opt Out","Email Opt Out"
+"Skype ID","Skype ID"
+"Secondary Email","Secondary Email"
+Twitter,Twitter
+"Mailing Street","Mailing Street"
+"Mailing City","Mailing City"
+"Mailing State","Mailing State"
+"Mailing Zip","Mailing Zip"
+"Mailing Country","Mailing Country"
+"Other Street","Other Street"
+"Other City","Other City"
+"Other State","Other State"
+"Other Zip","Other Zip"
+"Other Country","Other Country"
+Company,Company
+"Lead Status","Lead Status"
+"No. of Employees","No. of Employees"
+Rating,Rating
+City,City
+"Zip Code","Zip Code"
+Street,Street
+State,State
+Country,Country
+Subject,Subject
+"SO Number","SO Number"
+"PO Number","PO Number"
+"PO Date","PO Date"
+"Tracking Number","Tracking Number"
+"Dua Date","Dua Date"
+Carrier,Carrier
+"Sales Commission","Sales Commission"
+"Excise Duty","Excise Duty"
+"Sub Total","Sub Total"
+Discount,Discount
+Adjustment,Adjustment
+"Grand Total","Grand Total"
+"Terms and Conditions","Terms and Conditions"
+"Invoice Date","Invoice Date"
+"Due date","Due date"
+"Invoice Number","Invoice Number"
+Grand_Total,Grand_Total
+"Purchase Order","Purchase Order"
+"Term And Conditions","Term And Conditions"
+Product,Product
+Customer,Customer
+Invoice,Invoice
+"Rule name","Rule name"
+"From Date","From Date"
+"To Date","To Date"
+"Discount Amount","Discount Amount"
+Apply,Apply
+Order,Order
+"Invalid url","Invalid url"
+"Magento object does not exist","Magento object does not exist"
+"Conditions combination","Conditions combination"
+"Catalog Rule","Catalog Rule"
+From,From
+To,To
+"Conditions Combination","Conditions Combination"
+exists,exists
+"does not exist","does not exist"
+Subtotal,Subtotal
+"Total Quantity","Total Quantity"
+"Order Date","Order Date"
+"Order Status","Order Status"
+"Purchased From","Purchased From"
+"Payment Method","Payment Method"
+"Shipping Method","Shipping Method"
+"Shipping Postcode","Shipping Postcode"
+"Shipping Region","Shipping Region"
+"Shipping State/Province","Shipping State/Province"
+"Billing Postcode","Billing Postcode"
+"Billing Region","Billing Region"
+"Billing State/Province","Billing State/Province"
+"Total Weight","Total Weight"
+"Customer Group","Customer Group"
+"Tax Amount","Tax Amount"
+"Shipping Amount","Shipping Amount"
+US,US
+EU,EU
+CN,CN
+IN,IN
+"Catalog Rules","Catalog Rules"
+Sandbox,Sandbox
+Production,Production
+Create,Create
+Update,Update
+Delete,Delete
+"2 Minutes","2 Minutes"
+"5 Minutes","5 Minutes"
+"15 Minutes","15 Minutes"
+"30 Minutes","30 Minutes"
+"1 hour","1 hour"
+Daily,Daily
+Weekly,Weekly
+Monthly,Monthly
+Active,Active
+Inactive,Inactive
+Campaign,Campaign
+View,View
+"Queue ID","Queue ID"
+"Sync Rule","Sync Rule"
+"Json Response","Json Response"
+Syncing...,Syncing...
+"Zoho Fields","Zoho Fields"
+"Magento Fields","Magento Fields"
+"Default Value","Default Value"
+"Internal Note","Internal Note"
+General,General
+"This is a required field.","This is a required field."
+"Total Object","Total Object"
+"Total Pending","Total Pending"
+"Total Request","Total Request"
+"Queue #","Queue #"
+"Mageplaza ZohoCRM","Mageplaza ZohoCRM"
+"Manage Queues","Manage Queues"
+"General Configuration","General Configuration"
+Enabled,Enabled
+"Client ID","Client ID"
+"Get Client ID <a href=""https://accounts.zoho.com/developerconsole"" target=""_bank"">here</a>","Get Client ID <a href=""https://accounts.zoho.com/developerconsole"" target=""_bank"">here</a>"
+"Client Secret","Client Secret"
+"Get Client Secret <a href=""https://accounts.zoho.com/developerconsole"" target=""_bank"">here</a>","Get Client Secret <a href=""https://accounts.zoho.com/developerconsole"" target=""_bank"">here</a>"
+"Authorized Redirect URIs","Authorized Redirect URIs"
+"Copy and paste this value to Authorized Redirect URIs field on Zoho Client ID Details","Copy and paste this value to Authorized Redirect URIs field on Zoho Client ID Details"
+"Domain Users","Domain Users"
+"Select domain users for your Zoho account","Select domain users for your Zoho account"
+"Please save Client ID, Client Secret, Authorized Redirect URIs before getting Access Token","Please save Client ID, Client Secret, Authorized Redirect URIs before getting Access Token"
+"Queue Schedule","Queue Schedule"
+"Delete Queue Log After","Delete Queue Log After"
+"day(s). If empty, Log will no longer be deleted.","day(s). If empty, Log will no longer be deleted."
+Schedule,Schedule
+"The time to automatically synchronize the data sent to Zoho Module","The time to automatically synchronize the data sent to Zoho Module"
+"Number Of Objects Per Time","Number Of Objects Per Time"
+"The value is allowed to range from 1 to 1000. If empty or zero, schedule is not run.","The value is allowed to range from 1 to 1000. If empty or zero, schedule is not run."
+Developer,Developer
+"Developer Mode","Developer Mode"
+"Are you sure you want to add the selected customers?","Are you sure you want to add the selected customers?"
+"Add items","Add items"
+"Add To Zoho Queue As Account","Add To Zoho Queue As Account"
+"Add To Zoho Queue As Lead","Add To Zoho Queue As Lead"
+"Add To Zoho Queue As Contact","Add To Zoho Queue As Contact"
+"Delete items","Delete items"
+"Are you sure you want to delete selected items?","Are you sure you want to delete selected items?"
+Synchronize,Synchronize
+"Synchronize items","Synchronize items"
+"Are you sure you want to synchronize selected items?","Are you sure you want to synchronize selected items?"
+Event,Event
+"Total Sync","Total Sync"
+"Created Date","Created Date"
+"Add New","Add New"
+"Add Data to Queue","Add Data to Queue"
+"Add To Queue","Add To Queue"
+"Add to queue Items","Add to queue Items"
+"Are you sure you want to add to queue selected items?","Are you sure you want to add to queue selected items?"
+"Change Status","Change Status"
+Edit,Edit
+"Are you sure you want to add the selected product?","Are you sure you want to add the selected product?"
+"Are you sure you want to add the selected Order?","Are you sure you want to add the selected Order?"
+"Are you sure you want to add the selected Invoice?","Are you sure you want to add the selected Invoice?"

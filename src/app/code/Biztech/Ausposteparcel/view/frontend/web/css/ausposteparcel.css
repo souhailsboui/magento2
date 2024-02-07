@@ -1,0 +1,90 @@
+/* with popup form */
+#shipping-new-address-form {padding-bottom: 10px;}
+#shipping-new-address-form .action-secondary {
+    margin-bottom: 10px;
+    background: #1979c3;
+    border: 1px solid #1979c3;
+    color: #ffffff;
+    cursor: pointer;
+    display: inline-block;
+    font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    padding: 7px 15px;
+    font-size: 1.4rem;
+    box-sizing: border-box;
+    vertical-align: middle;
+    box-shadow: none;
+}
+#shipping-new-address-form .action-secondary:hover {
+    background: #006bb4;
+    border: 1px solid #006bb4;
+}
+#shipping-new-address-form .OpenValidatePopup {
+    margin: 0 0 10px 10px;
+    background: #1979c3;
+    border: 1px solid #1979c3;
+    color: #ffffff;
+    cursor: pointer;
+    display: inline-block;
+    font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    padding: 7px 15px;
+    font-size: 1.4rem;
+    box-sizing: border-box;
+    vertical-align: middle;
+    box-shadow: none;
+}
+#shipping-new-address-form .OpenValidatePopup:hover {
+    background: #006bb4;
+    border: 1px solid #006bb4;
+}
+#shipping-new-address-form .field.choice #shipping-save-in-address-book+label {display: inline-block;vertical-align: middle;margin: 0;}
+#shipping-new-address-form .field.choice #shipping-save-in-address-book {margin-right: 5px;}
+
+.Show-Suggetion-popupbox .ApplySuggetoinsPopup input[type="radio"],
+.Show-Suggetion-popupbox .ApplySuggetoinsPopup input[type="radio"]+label {display: inline-block;vertical-align: middle;margin: 0;}
+.Show-Suggetion-popupbox .ApplySuggetoinsPopup input[type="radio"] {margin-right: 5px;}
+
+/* without popup form */
+#checkout-step-shipping .OpenValidatePopup {
+    margin-left: 10px;
+    background: #1979c3;
+    border: 1px solid #1979c3;
+    color: #ffffff;
+    cursor: pointer;
+    display: inline-block;
+    font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    padding: 7px 15px;
+    font-size: 1.4rem;
+    box-sizing: border-box;
+    vertical-align: middle;
+    box-shadow: none;
+}
+#checkout-step-shipping .OpenValidatePopup:hover {
+    background: #006bb4;
+    border: 1px solid #006bb4;
+}
+.Show-Suggetion-popupbox .ApplySuggetoinbtn,.Show-Suggetion-popupbox .CanelSuggetoinbtn {
+    background: #1979c3;
+    border: 1px solid #1979c3;
+    color: #ffffff;
+    cursor: pointer;
+    display: inline-block;
+    font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    padding: 7px 15px;
+    font-size: 1.4rem;
+    box-sizing: border-box;
+    vertical-align: middle;
+    box-shadow: none;
+}
+.Show-Suggetion-popupbox .ApplySuggetoinbtn:hover,.Show-Suggetion-popupbox .CanelSuggetoinbtn:hover {
+    background: #006bb4;
+    border: 1px solid #006bb4;
+}
+
+@media screen and (max-width: 490px) {
+    #shipping-new-address-form .OpenValidatePopup,
+    #checkout-step-shipping .OpenValidatePopup {margin-left: 0;display: block;}
+}

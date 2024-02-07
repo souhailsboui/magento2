@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="webforms_result_save">
+        <observer name="mageme_customerregistration_webforms_result_save"
+                  instance="MageMe\WebFormsCustomerRegistration\Observer\WebformsResultSaveObserver"/>
+    </event>
+    <event name="webforms_result_approve">
+        <observer name="mageme_customerregistration_webforms_result_approve"
+                  instance="MageMe\WebFormsCustomerRegistration\Observer\WebformsResultApproveObserver"/>
+    </event>
+    <event name="webforms_validate_post_result">
+        <observer name="mageme_customerregistration_webforms_validate_post_result"
+                  instance="MageMe\WebFormsCustomerRegistration\Observer\WebformsValidatePostResultObserver"/>
+    </event>
+    <event name="webforms_form_import">
+        <observer name="mageme_customerregistration_webforms_form_import"
+                  instance="MageMe\WebFormsCustomerRegistration\Observer\WebformsFormImportObserver"/>
+    </event>
+    <event name="webforms_form_duplicate">
+        <observer name="mageme_customerregistration_webforms_form_duplicate"
+                  instance="MageMe\WebFormsCustomerRegistration\Observer\WebformsFormImportObserver"/>
+    </event>
+</config>

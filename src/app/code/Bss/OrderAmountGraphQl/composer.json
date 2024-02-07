@@ -1,0 +1,21 @@
+{
+  "name": "bsscommerce/order-amount-graph-ql",
+  "version": "1.0.0",
+  "description": "Min Order Amount GraphQl API Support",
+  "type": "magento2-module",
+  "require": {
+    "magento/framework": "*",
+    "bss/orderamount": "1.*"
+  },
+  "license": [
+    "Proprietary"
+  ],
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Bss\\CustomPricingGraphQl\\": ""
+    }
+  }
+}

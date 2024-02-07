@@ -1,0 +1,3 @@
+attribute_id,attribute_code,attribute_label,attribute_set_name,attribute_type,is_visual,is_searchable,is_filterable,is_comparable,is_visible_on_front,is_html_allowed_on_front,is_used_for_price_rules,is_filterable_in_search,used_in_product_listing,used_for_sort_by,is_visible_in_advanced_search,is_used_for_promo_rules,is_required_in_admin_store,is_used_in_grid,is_visible_in_grid,is_filterable_in_grid
+,color,Color,Default,select,1,1,1,1,1,1,1,0,1,1,1,0,0,1,1,1
+,size,Size,Default,select,0,1,1,1,1,1,1,0,1,1,1,0,0,1,1,1

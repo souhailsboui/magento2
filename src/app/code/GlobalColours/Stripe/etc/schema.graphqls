@@ -1,0 +1,10 @@
+input PlaceOrderInput {
+    stripe_return_url: String
+        @doc(
+            description: "Optional url for stripe payment to change return url"
+        )
+    stripe_cancel_url: String
+        @doc(
+            description: "Optional url for stripe payment to change cancel url"
+        )
+}

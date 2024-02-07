@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="MageMe\WebForms\Model\ResourceModel\Form">
+        <plugin name="webforms_zoho_add_serializable_fields"
+                type="MageMe\WebFormsZoho\Plugin\Model\ResourceModel\Form\GetSerializableFields"
+                sortOrder="10" disabled="false"/>
+    </type>
+    <type name="MageMe\WebForms\Helper\Result\PostHelper">
+        <plugin name="webforms_zoho_lead"
+                type="MageMe\WebFormsZoho\Plugin\Helper\Result\PostHelper\PostResult"
+                sortOrder="40" disabled="false"/>
+    </type>
+</config>

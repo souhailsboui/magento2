@@ -1,0 +1,13 @@
+<article>
+    <actualWeight>[[actualWeight]]</actualWeight>
+    <articleDescription>[[articleDescription]]</articleDescription>
+    <cubicWeight>0</cubicWeight>
+    <height>[[height]]</height>
+    <length>[[length]]</length>
+    [[width]]
+    <isTransitCoverRequired>[[isTransitCoverRequired]]</isTransitCoverRequired>
+    <transitCoverAmount>[[transitCoverAmount]]</transitCoverAmount>
+    <unitValue>[[unitValue]]</unitValue>
+    <contents></contents>
+    [[articleNumber]]
+</article>

@@ -1,0 +1,177 @@
+<style>
+	.field{
+		margin-bottom: 20px;
+	}
+	#system-msg{
+		padding: 10px;
+		background: #eee;
+		border: 1px solid #ccc;
+	}
+
+    .errors .list{
+        display: none;
+    }
+</style>
+<?php
+	$attributes = $block->getAllAttributes();
+
+    $dimensions = [
+        ['label' => 'Length', 'name' => 'length', 'has_native_attr' => false],
+        ['label' => 'Width', 'name' => 'width', 'has_native_attr' => false],
+        ['label' => 'Height', 'name' => 'height', 'has_native_attr' => false] ,
+        ['label' => 'Weight', 'name' => 'weight', 'has_native_attr' => true],
+    ];
+
+    $package_types = [
+        'Carton', 'Skid', 'Pallet', 'Pack', 'Crate', 'Roll', 'Satchel', 'Stillage', 'Tube', 'Bag'
+    ];
+
+    $dimension_units = [
+        '1' => __('CM'),
+        '10' => __('MM'),
+        '0.01' => __('M')
+    ];
+
+    $weight_units = [
+        '1' => __('KG'),
+        '1000' => __('G')
+    ];
+
+?>
+
+<form class="form" method="post">
+	<?php if(!empty($this->getMessage())): ?>
+		<div id="system-msg"><?php echo $this->getMessage(); ?></div><br />
+	<?php endif; ?>
+	<input name="form_key" type="hidden" value="<?php echo $block->getFormKey() ?>" />
+
+
+    <fieldset class="config admin__collapsible-block" id="fusedship_config_section_quoting_options_group">
+        <legend><?php echo __('Migration Settings') ?></legend>
+
+        <br/>
+        <p>Map box attributes</p>
+
+        <!-- <br/>
+        <div class="field">
+            <div class="control" style="display: inline-block;">
+                <input type="checkbox" id="native" name="native" />
+            </div>
+            <label for="native" class="label" style="display: inline-block;">
+                <span><?php echo __('Use Native Attributes (Available in Magento 2.3)') ?></span>
+            </label>
+        </div> -->
+
+        <table class="form-list">
+            <tbody>
+                <tr>
+                    <td colspan="3">&nbsp;</td>
+                </tr>
+                <?php foreach($dimensions as $dimension):?>
+                <tr class="custom-attr">
+                    <td class="label">
+                        <label for="<?php echo $dimension['name']; ?>"><span><?php echo $dimension['label']; ?></span></label>
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class="value">
+                        <select id="<?php echo $dimension['name']; ?>" name="<?php echo $dimension['name']; ?>" class="select admin__control-select">
+
+                            <?php if($dimension['has_native_attr']):?>
+                                <option value="use_native_attribute">Use Native Attribute</option>
+                                <option disabled>-----------------------------</option>
+                            <?php endif;?>
+                            <?php foreach($attributes as $id=>$attr): ?><option value="<?php echo $id; ?>"><?php echo $attr; ?></option><?php endforeach; ?>
+                        </select>
+                    </td>
+                </tr>
+                <tr class="custom-attr">
+                    <td colspan="3">&nbsp;</td>
+                </tr>
+                <?php endforeach; ?>
+                <tr>
+                    <td class="label">
+                        <label for="packge_type"><span>Package Type</span></label>
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class="value">
+                        <select id="package_type" name="package_type" class="select admin__control-select">
+                            <?php foreach($package_types as $package_type): ?><option value="static_pt_<?php echo $package_type; ?>"><?php echo $package_type; ?></option><?php endforeach; ?>
+                            <option disabled>-----------------------------</option>
+                            <?php foreach($attributes as $id=>$attr): ?><option value="<?php echo $id; ?>"><?php echo $attr; ?></option><?php endforeach; ?>
+                        </select>
+                    </td>
+                </tr>
+
+                <tr class="custom-attr">
+                    <td colspan="3">&nbsp;</td>
+                </tr>
+
+                <tr>
+                    <td class="label" colspan="2">
+                        <label for="selbox_dimension_unit">Select the unit of measure in your dimension fields<span></span></label>
+                    </td>
+                    <td class="value">
+                        <select id="selbox_dimension_unit" name="dimension_unit" class="select admin__control-select">
+                            <?php foreach($dimension_units as $unit_value => $unit_text): ?>
+                                <option value="<?php echo $unit_value; ?>"><?php echo $unit_text; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </td>
+
+                </tr>
+
+                <tr class="custom-attr">
+                    <td colspan="3">&nbsp;</td>
+                </tr>
+
+                <tr>
+                    <td class="label" colspan="2">
+                        <label for="selbox_weight_unit">Select box weight unit<span></span></label>
+                    </td>
+                    <td class="value">
+                        <select id="selbox_weight_unit" name="weight_unit" class="select admin__control-select">
+                            <?php foreach($weight_units as $unit_value => $unit_text): ?>
+                                <option value="<?php echo $unit_value; ?>"><?php echo $unit_text; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                <tr>
+                    <td colspan="3">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <label><input type="checkbox" name="overwrite"/> Overwrite existing box settings</label>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </fieldset>
+
+    <br/>
+    <div class="actions-toolbar">
+        <div class="primary">
+            <button type="submit" class="action submit primary" title="<?php echo __('Submit') ?>">
+                <span><?php echo __('Submit') ?></span>
+            </button>
+        </div>
+    </div>
+
+</form>
+<script>
+        require([
+            'jquery',
+            'mage/template',
+            'prototype',
+            'jquery/ui'
+        ], function ( jquery, mageTemplate ) {
+            jQuery(document).ready(function(){
+                jQuery('#native').on('change',function(){
+                    if(jQuery(this).prop('checked')){
+                        jQuery('.custom-attr').hide();
+                    }else{
+                        jQuery('.custom-attr').show();
+                    }
+                })
+            })
+        })
+
+</script>

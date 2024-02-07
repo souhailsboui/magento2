@@ -1,0 +1,30 @@
+<?php
+/** @var Messages $block */
+
+use MageMe\WebForms\Block\Customer\Account\Result\Messages;
+
+$messages = $block->getMessages();
+?>
+<?php foreach ($messages as $message): ?>
+    <div class="box-account webforms-customer-account-message <?= $message->getIsFromCustomer() ? 'customer' : 'response'?>">
+        <div class="block">
+
+            <div class="block-content">
+                <?= $message->getMessage() ?>
+                <?php $files = $block->getMessageFiles($message);
+                if (!empty($files)) { ?>
+                    <div class="block-attachments">
+                        <?php foreach ($files as $file): ?>
+                            <?= $file->getDownloadHtml() ?>
+                        <?php endforeach; ?>
+                    </div>
+                <?php } ?>
+            </div>
+
+            <div class="block-bottom">
+                <?php $date = $block->formatDate($message->getCreatedAt(), IntlDateFormatter::MEDIUM, true); ?>
+                <?= $message->getIsFromCustomer() ? __('You replied on %1',$date) : __('Replied by %1 on %2', $message->getAuthor(), $date) ?>
+            </div>
+        </div>
+    </div>
+<?php endforeach; ?>

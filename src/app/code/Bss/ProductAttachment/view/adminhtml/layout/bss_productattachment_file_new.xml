@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * BSS Commerce Co.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://bsscommerce.com/Bss-Commerce-License.txt
+ *
+ * @category   BSS
+ * @package    Bss_ProductAttachment
+ * @author     Extension Team
+ * @copyright  Copyright (c) 2017-2018 BSS Commerce Co. ( http://bsscommerce.com )
+ * @license    http://bsscommerce.com/Bss-Commerce-License.txt
+ */
+-->
+
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd" layout="admin-2columns-left">
+	<update handle="editor"/>
+    <body>
+        <referenceContainer name="content">
+            <block class="Bss\ProductAttachment\Block\Adminhtml\File\Edit" name="bss_productattachment_file_edit"/>
+        </referenceContainer>
+        <referenceContainer name="left">
+            <block class="Bss\ProductAttachment\Block\Adminhtml\File\Edit\Tabs" name="bss_productattachment_file_tabs">
+                <block class="Bss\ProductAttachment\Block\Adminhtml\File\Edit\Tab\File" 
+                    name="bss_productattachment_file_edit_tab_general"/>
+
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">attachment</argument>
+                    <argument name="block" xsi:type="string">bss_productattachment_file_edit_tab_general</argument>
+                </action>
+
+                <action method="addTab">
+                    <argument name="name" xsi:type="string">product</argument>
+                    <argument name="block" xsi:type="array">
+                        <item name="label" xsi:type="string">Assign to Products</item>
+                        <item name="title" xsi:type="string">Assign to Products</item>
+                        <item name="url" xsi:type="helper" helper="Bss\ProductAttachment\Helper\Data::getProductsGridUrl"/>
+                        <item name="class" xsi:type="string">ajax</item>
+                    </argument>
+
+                </action>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

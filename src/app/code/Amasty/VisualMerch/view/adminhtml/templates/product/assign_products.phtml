@@ -1,0 +1,25 @@
+<?php
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Visual Merchandiser for Magento 2
+ */
+$blockGrid = $block->getBlockGrid();
+$gridJsObjectName = $blockGrid->getJsObjectName();
+?>
+<?= $block->getGridHtml() ?>
+<input type="hidden" name="category_products" value="" />
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Amasty_VisualMerch/js/assign-products": {
+                "selectedProducts": <?= /* @noEscape */ $block->getProductsJson() ?>,
+                "gridJsObjectName": "<?= /* @noEscape */ $gridJsObjectName ?: '{}' ?>"
+            }
+        }
+    }
+</script>
+
+<script>
+    require('mage/apply/main').apply();
+</script>

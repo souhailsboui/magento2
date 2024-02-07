@@ -1,0 +1,55 @@
+<?php
+/**
+ * Mageplaza
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Mageplaza.com license that is
+ * available through the world-wide-web at this URL:
+ * https://www.mageplaza.com/LICENSE.txt
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Mageplaza
+ * @package     Mageplaza_ZohoCRM
+ * @copyright   Copyright (c) Mageplaza (https://www.mageplaza.com/)
+ * @license     https://www.mageplaza.com/LICENSE.txt
+ */
+
+/**
+ * @var \Mageplaza\ZohoCRM\Block\Adminhtml\System\Config\AccessToken $block
+ */
+?>
+
+<?= $block->getButtonHtml() ?>
+
+<script>
+    require([
+        'jquery'
+    ], function ($) {
+        var accessTokenButton   = $("#access_token_button"),
+            clientId            = $('#zohoCRM_general_client_id').val(),
+            clientSecret        = $('#zohoCRM_general_client_secret').val(),
+            redirectURIsElement = $('#zohoCRM_general_redirect_URIs');
+
+        redirectURIsElement.attr('readonly', 'readonly');
+        if (!redirectURIsElement.val()) {
+            redirectURIsElement.val("<?= $block->escapeJs($block->getAuthorizedRedirectURIs()) ?>");
+        }
+
+        if (!clientId || !clientSecret) {
+            accessTokenButton.addClass('disabled');
+        }
+
+        accessTokenButton.click(function () {
+            window.open(
+                "<?= $block->escapeJs($block->getAccessTokenUrl()) ?>",
+                "_blank",
+                "location=yes,height=800,width=1000,scrollbars=yes,status=yes"
+            );
+        });
+    });
+</script>
