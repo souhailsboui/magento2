@@ -1,0 +1,8 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="StripeIntegration\Payments\Controller\Payment\Index">
+        <plugin name="stripe_controller" type="GlobalColours\Stripe\Plugin\PaymentPLugin" sortOrder="10" disabled="false"/>
+    </type>
+    <type name="Magento\QuoteGraphQl\Model\Resolver\PlaceOrder">
+        <plugin name="place_order_extras" type="GlobalColours\Stripe\Plugin\PlaceOrderPlugin" sortOrder="10" disabled="false"/>
+    </type>
+</config>

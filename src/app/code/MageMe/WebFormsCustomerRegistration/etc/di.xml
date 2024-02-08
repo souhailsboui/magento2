@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="MageMe\WebForms\Model\ResourceModel\Form">
+        <plugin name="webforms_cr_add_serializable_fields"
+                type="MageMe\WebFormsCustomerRegistration\Plugin\WebForms\Model\ResourceModel\Form\GetSerializableFields"
+                sortOrder="30" disabled="false"/>
+    </type>
+
+    <type name="MageMe\WebForms\Helper\ConvertVersion\FormConverter">
+        <plugin name="webforms_customerregistration_form_converter"
+                type="MageMe\WebFormsCustomerRegistration\Plugin\WebForms\Helper\ConvertVersion\FormConverter"
+                sortOrder="30"
+                disabled="false"/>
+    </type>
+    
+    <type name="MageMe\WebForms\Model\Field\Type\Subscribe">
+        <plugin name="webforms_customerregistration_subscribe_process_new_result"
+                type="MageMe\WebFormsCustomerRegistration\Plugin\WebForms\Model\Field\Type\Subscribe\ProcessNewResult"
+                sortOrder="10"
+                disabled="false"/>
+    </type>
+</config>

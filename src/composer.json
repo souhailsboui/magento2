@@ -22,7 +22,12 @@
     "require": {
         "magento/product-community-edition": "2.4.6-p3",
         "magento/composer-dependency-version-audit-plugin": "~0.1",
-        "magento/composer-root-update-plugin": "~2.0"
+        "magento/composer-root-update-plugin": "~2.0",
+        "mageplaza/module-automatic-related-products-graphql": "^1.1",
+        "mageplaza/module-core": "^1.5",
+        "mageplaza/module-store-credit-graphql": "^1.0",
+        "stripe/stripe-payments": "^3.5",
+        "klaviyo/magento2-extension": "^4.0"
     },
     "autoload": {
         "exclude-from-classmap": [

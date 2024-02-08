@@ -1,0 +1,8 @@
+<div class="captcha-wrapper" data-bind="{
+    'afterRender': renderCaptcha()
+}">
+    <input type="hidden" class="required-entry" data-bind="name: responseFieldName"/>
+    <div data-bind="css: getPositionClass()">
+        <div class="recaptcha-container"></div>
+    </div>
+</div>

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="meetanshi_shippingrestrict_rules" resource="default" engine="innodb" comment="Shipping Restriction">
+        <column xsi:type="int" name="rule_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Rule Id"/>
+        <column xsi:type="smallint" name="is_active" padding="5" unsigned="false" nullable="false" default="0" comment="Is Active"/>
+        <column xsi:type="varchar" name="error_message" length="255" nullable="true" comment="Error Message"/>
+        <column xsi:type="varchar" name="name" length="255" nullable="false" comment="Name"/>
+        <column xsi:type="varchar" name="days" length="255" nullable="false" comment="Days"/>
+        <column xsi:type="varchar" name="stores" length="255" nullable="false" comment="Stores"/>
+        <column xsi:type="varchar" name="customer_groups" length="255" nullable="false" comment="Customer Groups"/>
+        <column xsi:type="text" name="shipping_carriers" nullable="true" comment="Shipping Carriers"/>
+        <column xsi:type="text" name="shipping_methods" nullable="true" comment="Shipping Methods"/>
+        <column xsi:type="text" name="conditions_serialized" nullable="true" comment="Condition Serialized"/>
+        <column xsi:type="text" name="actions_serialized" nullable="true" comment="Action Serialized"/>
+        <column xsi:type="int" name="from_time" padding="11" unsigned="false" default="1" nullable="false" comment="From Time"/>
+        <column xsi:type="int" name="to_time" padding="11" unsigned="false" default="1" nullable="false" comment="To Time"/>
+        <column xsi:type="smallint" name="is_admin" padding="6" unsigned="true" nullable="false" comment="Allowed Guest or Not"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="rule_id"/>
+        </constraint>
+    </table>
+
+    <table name="meetanshi_shippingrestrict_attributes" resource="default" engine="innodb" comment="Shipping Restriction Attributes">
+        <column xsi:type="int" name="attr_id" padding="10" unsigned="false" nullable="false" identity="true" comment="Attribute Id"/>
+        <column xsi:type="int" name="rule_id" padding="10" unsigned="true" default="1" nullable="false" comment="Rule Id"/>
+        <column xsi:type="varchar" name="code" length="255" nullable="false" comment="Code"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="attr_id"/>
+        </constraint>
+        <index referenceId="meetanshi_shippingrestrict_attributes" indexType="btree">
+            <column name="rule_id"/>
+        </index>
+        <constraint xsi:type="foreign" referenceId="meetanshi_shippingrestrict_rules_rule_id" table="meetanshi_shippingrestrict_attributes" column="rule_id" referenceTable="meetanshi_shippingrestrict_rules" referenceColumn="rule_id" onDelete="CASCADE"/>
+    </table>
+</schema>

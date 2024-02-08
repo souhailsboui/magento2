@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * BSS Commerce Co.
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the EULA
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://bsscommerce.com/Bss-Commerce-License.txt
+ *
+ * @category   BSS
+ * @package    Bss_ProductAttachment
+ * @author     Extension Team
+ * @copyright  Copyright (c) 2017-2018 BSS Commerce Co. ( http://bsscommerce.com )
+ * @license    http://bsscommerce.com/Bss-Commerce-License.txt
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+	<default>
+		<attachment>
+			<general>
+				<enable>1</enable>
+				<show_product_tab>1</show_product_tab>
+				<tab_title>Downloads</tab_title>
+				<show_block>0</show_block>
+				<block_title>Download Attachment(s):</block_title>
+				<max_size>15</max_size>
+				<show_file_size>1</show_file_size>
+				<show_download_number>1</show_download_number>
+			</general>
+		</attachment>
+	</default>
+</config>

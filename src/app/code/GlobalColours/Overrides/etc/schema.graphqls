@@ -1,0 +1,20 @@
+type MpStoreCreditCustomerTransaction {
+    amount: String @doc(description: "Amount")
+    balance: String @doc(description: "Balance")
+}
+
+type SimpleProduct {
+    parent_configurable_product: ConfigurableProduct
+        @doc(description: "Parent configurable product")
+        @resolver(
+            class: "GlobalColours\\Overrides\\Model\\Resolver\\ParentConfigurableProduct"
+        )
+}
+
+type Customer {
+    group_code: String
+        @doc(description: "Customer group")
+        @resolver(
+            class: "GlobalColours\\Overrides\\Model\\Resolver\\CustomerGroup"
+        )
+}

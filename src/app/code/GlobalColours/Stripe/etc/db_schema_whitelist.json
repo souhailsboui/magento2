@@ -1,0 +1,8 @@
+{
+    "sales_order": {
+        "column": {
+            "stripe_return_url": true,
+            "stripe_cancel_url": true
+        }
+    }
+}

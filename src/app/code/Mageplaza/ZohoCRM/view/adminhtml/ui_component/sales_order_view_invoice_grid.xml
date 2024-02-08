@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Mageplaza
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Mageplaza.com license that is
+ * available through the world-wide-web at this URL:
+ * https://www.mageplaza.com/LICENSE.txt
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade this extension to newer
+ * version in the future.
+ *
+ * @category    Mageplaza
+ * @package     Mageplaza_ZohoCRM
+ * @copyright   Copyright (c) Mageplaza (https://www.mageplaza.com/)
+ * @license     https://www.mageplaza.com/LICENSE.txt
+ */
+-->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <listingToolbar name="listing_top">
+        <massaction name="listing_massaction" component="Mageplaza_ZohoCRM/js/order/invoice/grid/massactions">
+            <action name="add_to_queue" class="Mageplaza\ZohoCRM\Ui\Component\Control\InvoiceAction">
+                <settings>
+                    <confirm>
+                        <message translate="true">Are you sure you want to add the selected Invoice?</message>
+                        <title translate="true">Add items</title>
+                    </confirm>
+                    <url path="mpzoho/invoice/massAction"/>
+                    <type>invoice</type>
+                    <label translate="true">Add To Zoho Queue</label>
+                </settings>
+            </action>
+        </massaction>
+    </listingToolbar>
+</listing>

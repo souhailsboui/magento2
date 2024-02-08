@@ -1,0 +1,34 @@
+<?php
+
+/** @var $block AbstractConfigField */
+
+use MageMe\WebFormsZoho\Block\Adminhtml\System\AbstractConfigField;
+
+?>
+<?php if ($block->isConfigured()) { ?>
+    <span id="<?= $block->getHtmlId() ?>_message">...</span>
+
+    <script>
+        (() => {
+            const url = "<?= $block->getAjaxUrl(); ?>";
+            const span = document.getElementById("<?= $block->getHtmlId() ?>_message");
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', url, true);
+            xhr.responseType = 'json';
+            xhr.onload = () => {
+                if (xhr.status !== 200) {
+                    return span.innerText = xhr.statusText;
+                }
+                if (!xhr.response) {
+                    return span.innerText = "<?= __('Unexpected error'); ?>";
+                }
+                span.innerText = xhr.response['message'];
+            }
+            let data = new FormData();
+            data.append("isAjax", "true");
+            data.append('form_key', window.FORM_KEY);
+            xhr.send(data);
+        })();
+    </script>
+<?php } ?>
+

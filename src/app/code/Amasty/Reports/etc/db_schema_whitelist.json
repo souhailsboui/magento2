@@ -1,0 +1,141 @@
+{
+    "amasty_reports_customers_customers_daily": {
+        "column": {
+            "id": true,
+            "period": true,
+            "store_id": true,
+            "new_accounts": true,
+            "orders": true,
+            "reviews": true
+        },
+        "index": {
+            "AMASTY_REPORTS_CUSTOMERS_CUSTOMERS_DAILY_STORE_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "AMASTY_REPORTS_CUSTOMERS_CUSTOMERS_DAILY_STORE_ID_STORE_STORE_ID": true,
+            "AMASTY_REPORTS_CUSTOMERS_CUSTOMERS_DAILY_PERIOD_STORE_ID": true
+        }
+    },
+    "amasty_reports_customers_customers_weekly": {
+        "column": {
+            "id": true,
+            "period": true,
+            "store_id": true,
+            "new_accounts": true,
+            "orders": true,
+            "reviews": true
+        },
+        "index": {
+            "AMASTY_REPORTS_CUSTOMERS_CUSTOMERS_WEEKLY_STORE_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "AMASTY_REPORTS_CSTRS_CSTRS_WEEKLY_STORE_ID_STORE_STORE_ID": true,
+            "AMASTY_REPORTS_CUSTOMERS_CUSTOMERS_WEEKLY_PERIOD_STORE_ID": true
+        }
+    },
+    "amasty_reports_customers_customers_monthly": {
+        "column": {
+            "id": true,
+            "period": true,
+            "store_id": true,
+            "new_accounts": true,
+            "orders": true,
+            "reviews": true
+        },
+        "index": {
+            "AMASTY_REPORTS_CUSTOMERS_CUSTOMERS_MONTHLY_STORE_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "AMASTY_REPORTS_CSTRS_CSTRS_MONTHLY_STORE_ID_STORE_STORE_ID": true,
+            "AMASTY_REPORTS_CUSTOMERS_CUSTOMERS_MONTHLY_PERIOD_STORE_ID": true
+        }
+    },
+    "amasty_reports_customers_customers_yearly": {
+        "column": {
+            "id": true,
+            "period": true,
+            "store_id": true,
+            "new_accounts": true,
+            "orders": true,
+            "reviews": true
+        },
+        "index": {
+            "AMASTY_REPORTS_CUSTOMERS_CUSTOMERS_YEARLY_STORE_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "AMASTY_REPORTS_CSTRS_CSTRS_YEARLY_STORE_ID_STORE_STORE_ID": true,
+            "AMASTY_REPORTS_CUSTOMERS_CUSTOMERS_YEARLY_PERIOD_STORE_ID": true
+        }
+    },
+    "amasty_reports_rule": {
+        "column": {
+            "entity_id": true,
+            "title": true,
+            "status": true,
+            "updated_at": true,
+            "conditions_serialized": true,
+            "pin": true
+        },
+        "index": {
+            "AMASTY_REPORTS_RULE_ENTITY_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "amasty_reports_rule_index": {
+        "column": {
+            "rule_id": true,
+            "store_id": true,
+            "product_id": true
+        },
+        "index": {
+            "AMASTY_REPORTS_RULE_INDEX_RULE_ID_STORE_ID": true
+        },
+        "constraint": {
+            "AMASTY_REPORTS_RULE_IDX_PRD_ID_CAT_PRD_ENTT_ENTT_ID": true,
+            "AMASTY_REPORTS_RULE_INDEX_RULE_ID_AMASTY_REPORTS_RULE_ENTITY_ID": true,
+            "AMASTY_REPORTS_RULE_INDEX_STORE_ID_STORE_STORE_ID": true,
+            "PRIMARY": true
+        }
+    },
+    "amasty_reports_abandoned_cart": {
+        "column": {
+            "entity_id": true,
+            "quote_id": true,
+            "store_id": true,
+            "customer_name": true,
+            "status": true,
+            "created_at": true,
+            "items_qty": true,
+            "products": true,
+            "grand_total": true,
+            "coupon_code": true,
+            "customer_id": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "amasty_reports_notification": {
+        "column": {
+            "entity_id": true,
+            "name": true,
+            "reports": true,
+            "store_ids": true,
+            "interval_qty": true,
+            "interval": true,
+            "display_period": true,
+            "receiver": true,
+            "frequency": true,
+            "cron_schedule": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    }
+}

@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * BSS Commerce Co.
+ *
+ * NOTICE OF LICENSE
+ *
+ * @category   BSS
+ * @package    Bss_ProductAttachment
+ * @author     Extension Team
+ * @copyright  Copyright (c) 2018-2019 BSS Commerce Co. ( http://bsscommerce.com )
+ * @license    http://bsscommerce.com/Bss-Commerce-License.txt
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Magento_Catalog::catalog" >
+                    <resource id="Bss_ProductAttachment::main" title="Product Attachment by Bss Commerce" sortOrder="200" translate="title">
+                        <resource id="Bss_ProductAttachment::attachment" title="Product Attachments Management" sortOrder="1" translate="title"/>
+                        <resource id="Bss_ProductAttachment::delete" title="Delete Product Attachments" sortOrder="2"/>
+                        <resource id="Bss_ProductAttachment::save" title="Save Product Attachments " sortOrder="3"/>
+                    </resource>
+                </resource>
+                <resource id="Magento_Backend::stores">
+                    <resource id="Magento_Backend::stores_settings">
+                        <resource id="Magento_Config::config">
+                            <resource id="Bss_ProductAttachment::config_attachment" title="Attachment Settings" sortOrder="10" translate="title" />
+                        </resource>
+                    </resource>
+                </resource>
+                <resource id="Bss_ProductAttachment::product_attachment" title="Bss Product Attachment" sortOrder="100">
+                    <resource id="Bss_ProductAttachment::api" title="API" sortOrder="10" />
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Shipping\Model\Shipping">
+        <plugin name="Meetanshi_ShippingRules::Shipping" type="Meetanshi\ShippingRules\Plugin\Shipping\Model\Shipping" />
+    </type>
+    <type name="Magento\Quote\Model\Quote\Config">
+        <plugin name="Meetanshi_ShippingRules::Attributes" type="Meetanshi\ShippingRules\Plugin\Quote\Model\Quote\Attributes" />
+    </type>
+    <type name="Magento\Quote\Model\Quote\Address\Rate">
+        <plugin name="Meetanshi_ShippingRules::ImportRate" type="Meetanshi\ShippingRules\Plugin\Quote\Model\Quote\Address\ImportRate" />
+    </type>
+</config>

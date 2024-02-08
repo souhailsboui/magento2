@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Visual Merchandiser for Magento 2
+ */-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Catalog\Controller\Adminhtml\Category\Edit">
+        <plugin name="Amasty_VisualMerch::initAdminMerch"
+                type="Amasty\VisualMerch\Plugin\Catalog\Controller\Adminhtml\Category\Edit"/>
+    </type>
+    <type name="Magento\Catalog\Controller\Adminhtml\Category\Add">
+        <plugin name="Amasty_VisualMerch::initAdminMerch"
+                type="Amasty\VisualMerch\Plugin\Catalog\Controller\Adminhtml\Category\Add"/>
+    </type>
+    <type name="Magento\Catalog\Model\ResourceModel\Eav\Attribute">
+        <plugin name="Amasty_VisualMerch::fixAttributeConditions"
+                type="Amasty\VisualMerch\Plugin\Catalog\Model\ResourceModel\Eav\Attribute"/>
+    </type>
+    <type name="Amasty\Xlanding\Block\Adminhtml\Page\Edit\Tab\Main">
+        <plugin name="Amasty_VisualMerch::xlandingCompatibility"
+                type="Amasty\VisualMerch\Plugin\Xlanding\Block\Adminhtml\Page\Edit\Tab\Main"/>
+    </type>
+    <type name="Amasty\Xlanding\Model\Page">
+        <plugin name="Amasty_VisualMerch::xlandingCompatibility"
+                type="Amasty\VisualMerch\Plugin\Xlanding\Model\Page"/>
+    </type>
+
+    <virtualType name="Amasty\VisualMerch\Session\StorageInterface" type="Magento\Framework\Session\Storage">
+        <arguments>
+            <argument name="namespace" xsi:type="string">amasty_visual_merch</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Amasty\VisualMerch\Model\Adminhtml\Session">
+        <arguments>
+            <argument name="storage" xsi:type="object">Amasty\VisualMerch\Session\StorageInterface</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Catalog\Model\ResourceModel\Product\CategoryLink">
+        <plugin name="adminhtmlRankCategoryProductPositionsPlugin" disabled="true" />
+        <plugin name="Amasty_VisualMerch::rankCategoryProductPosition" type="Amasty\VisualMerch\Plugin\Catalog\Model\ResourceModel\Product\CategoryLink\RankCategoryProductPosition" />
+    </type>
+
+    <type name="Magento\Catalog\Model\Category\DataProvider">
+        <plugin name="Amasty_VisualMerch::addAutomaticCategoryAttribute"
+                type="Amasty\VisualMerch\Plugin\Catalog\Model\Category\DataProvider\AddAmlandingIsDynamic"
+                sortOrder="20" />
+        <plugin name="Amasty_VisualMerch::AddScheduleWarningMessage"
+                type="Amasty\VisualMerch\Plugin\Catalog\Model\Category\DataProvider\AddScheduleWarningMessage"
+                sortOrder="30" />
+        <plugin name="Amasty_VisualMerch::AddNonStoreCategoryWarning"
+                type="Amasty\VisualMerch\Plugin\Catalog\Model\Category\DataProvider\AddNonStoreCategoryWarning"
+                sortOrder="40" />
+    </type>
+</config>

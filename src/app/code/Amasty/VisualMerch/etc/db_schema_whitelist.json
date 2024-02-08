@@ -1,0 +1,51 @@
+{
+    "catalog_category_product_static": {
+        "column": {
+            "category_id": true,
+            "product_id": true,
+            "store_id": true,
+            "position": true
+        },
+        "index": {
+            "CATALOG_CATEGORY_PRODUCT_STATIC_PRODUCT_ID": true,
+            "CATALOG_CATEGORY_PRODUCT_STATIC_CATEGORY_ID": true
+        },
+        "constraint": {
+            "CAT_CTGR_PRD_STATIC_PRD_ID_CAT_PRD_ENTT_ENTT_ID": true,
+            "CAT_CTGR_PRD_STATIC_CTGR_ID_CAT_CTGR_ENTT_ENTT_ID": true,
+            "CATALOG_CATEGORY_PRODUCT_STATIC_CATEGORY_ID_PRODUCT_ID_STORE_ID": true,
+            "CATALOG_CATEGORY_PRODUCT_STATIC_CATEGORY_ID_PRODUCT_ID": true
+        }
+    },
+    "amasty_merch_dynamic_category_products_temporary": {
+        "column": {
+            "hash": true,
+            "category_id": true,
+            "matched_ids": true,
+            "created_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "amasty_merch_dynamic_category_products": {
+        "column": {
+            "category_id": true,
+            "store_id": true,
+            "product_id": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "amasty_merch_dynamic_category_products_replica": {
+        "column": {
+            "category_id": true,
+            "store_id": true,
+            "product_id": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    }
+}

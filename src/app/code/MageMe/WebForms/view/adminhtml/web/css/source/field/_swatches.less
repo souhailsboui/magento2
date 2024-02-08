@@ -1,0 +1,54 @@
+/* Swatches */
+.mm-swatches {
+    .field {
+        padding-left: 0;
+
+        label {
+            input {
+                position: fixed;
+                opacity: 0;
+                z-index: -1;
+            }
+
+            span {
+                display: inline-block;
+                border: 1px solid #dadada;
+                cursor: pointer;
+                max-width: 100%;
+                overflow: hidden;
+                position: relative;
+                text-align: center;
+                text-overflow: ellipsis;
+                background: #f0f0f0;
+                color: #686868;
+                font-weight: 600;
+                line-height: 30px;
+                height: 30px;
+                min-width: 20px;
+                padding: 0 8px;
+                box-sizing: content-box;
+            }
+
+            input:disabled + span {
+                box-shadow: unset;
+                cursor: default;
+                pointer-events: none;
+            }
+
+            input:not([disabled]):hover + span {
+                background-color: #ffffff;
+                color: black;
+            }
+
+            input:checked + span {
+                background-color: #ffffff;
+                border: 1px solid #ffffff;
+                color: black;
+                outline: 3px solid #0088cc;
+                border-radius: 2px;
+            }
+
+        }
+    }
+}
+

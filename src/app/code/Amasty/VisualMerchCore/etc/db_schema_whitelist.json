@@ -1,0 +1,77 @@
+{
+    "amasty_merchandiser_product_index_eav": {
+        "column": {
+            "entity_id": true,
+            "attribute_id": true,
+            "store_id": true,
+            "value": true,
+            "source_id": true
+        },
+        "index": {
+            "AMASTY_MERCHANDISER_PRODUCT_INDEX_EAV_ATTRIBUTE_ID": true,
+            "AMASTY_MERCHANDISER_PRODUCT_INDEX_EAV_STORE_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "amasty_merchandiser_product_index_eav_replica": {
+        "column": {
+            "entity_id": true,
+            "attribute_id": true,
+            "store_id": true,
+            "value": true,
+            "source_id": true
+        },
+        "index": {
+            "AMASTY_MERCHANDISER_PRODUCT_INDEX_EAV_ATTRIBUTE_ID": true,
+            "AMASTY_MERCHANDISER_PRODUCT_INDEX_EAV_STORE_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "amasty_merchandiser_product_index_eav_tmp": {
+        "column": {
+            "entity_id": true,
+            "attribute_id": true,
+            "store_id": true,
+            "value": true,
+            "source_id": true
+        },
+        "index": {
+            "AMASTY_MERCHANDISER_PRODUCT_INDEX_EAV_ATTRIBUTE_ID": true,
+            "AMASTY_MERCHANDISER_PRODUCT_INDEX_EAV_STORE_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "amasty_merchandiser_visible_product": {
+        "column": {
+            "product_id": true,
+            "store_id": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "amasty_merchandiser_visible_product_replica": {
+        "column": {
+            "product_id": true,
+            "store_id": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "amasty_merchandiser_visible_product_tmp": {
+        "column": {
+            "product_id": true,
+            "store_id": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    }
+}

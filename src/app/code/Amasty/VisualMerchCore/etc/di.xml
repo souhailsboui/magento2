@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Amasty Team
+ * @copyright Copyright (c) Amasty (https://www.amasty.com)
+ * @package Visual Merchandiser Core by Amasty for Magento 2 (System)
+ */-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Catalog\Model\Product">
+        <plugin name="Amasty_VisualMerchCore::addReindexRowCallback"
+                type="Amasty\VisualMerchCore\Plugin\Catalog\Model\ProductPlugin"/>
+    </type>
+
+    <type name="Amasty\Base\Plugin\Setup\Model\DeclarationInstaller\ApplyPatchesBeforeDeclarativeSchema">
+        <arguments>
+            <argument name="moduleNames" xsi:type="array">
+                <item name="amasty_visual_merch_core" xsi:type="string">Amasty_VisualMerchCore</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Amasty\VisualMerchCore\Model\ResourceModel\Product\Indexer\Eav\Adapter">
+        <plugin name="Amasty_Shopby::ExcludeOutOfStockFromEav" disabled="true"/>
+    </type>
+</config>
