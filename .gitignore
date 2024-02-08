@@ -62,6 +62,8 @@
 /src/pub/media/captcha/*
 /src/pub/media/sitemap/*
 !/src/pub/media/sitemap/.htaccess
+/src/dev/*
+!/src/dev/.htaccess
 /src/pub/static/*
 !/src/pub/static/.htaccess
 
