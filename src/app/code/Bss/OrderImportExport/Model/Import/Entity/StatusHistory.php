@@ -12,7 +12,7 @@
  * @category   BSS
  * @package    Bss_OrderImportExport
  * @author     Extension Team
- * @copyright  Copyright (c) 2020 BSS Commerce Co. ( http://bsscommerce.com )
+ * @copyright  Copyright (c) 2020-2023 BSS Commerce Co. ( http://bsscommerce.com )
  * @license    http://bsscommerce.com/Bss-Commerce-License.txt
  */
 namespace Bss\OrderImportExport\Model\Import\Entity;
@@ -102,9 +102,7 @@ class StatusHistory extends AbstractEntity
      *
      * @var array
      */
-    protected $requiredValueColumns = [
-        'comment',
-    ];
+    protected $requiredValueColumns = [];
 
     /**
      * Retrieve Data For Each Entity

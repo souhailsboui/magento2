@@ -63,10 +63,10 @@ class StoresPatch implements DataPatchInterface, PatchRevertableInterface
         $this->updateWebsiteDefaultStoreGroup($webSiteId, $globalStoreGroupId);
 
         // Create the global stores
-        $audStoreId = $this->createStore($webSiteId, $globalStoreGroupId, $this->audStoreCode, 'AUD', 'AUD', 'AUD', 'AU', 'AU,NZ,US,CA,GB,EU', 'en_UK', 'kgs', false);
+        $audStoreId = $this->createStore($webSiteId, $globalStoreGroupId, $this->audStoreCode, 'AUD', 'AUD', 'AUD', 'AU', 'AU,NZ,US,CA,GB,EU', 'en_GB', 'kgs', false);
         $usdStoreId = $this->createStore($webSiteId, $globalStoreGroupId, $this->usdStoreCode, 'USD', 'USD', 'USD', 'US', 'AU,NZ,US,CA,GB,EU', 'en_US', 'kgs', false);
         $cadStoreId = $this->createStore($webSiteId, $globalStoreGroupId, $this->cadStoreCode, 'CAD', 'CAD', 'CAD', 'CA', 'AU,NZ,US,CA,GB,EU', 'en_US', 'kgs', false);
-        $gbpStoreId = $this->createStore($webSiteId, $globalStoreGroupId, $this->gbpStoreCode, 'GBP', 'GBP', 'GBP', 'GB', 'AU,NZ,US,CA,GB,EU', 'en_UK', 'kgs', false);
+        $gbpStoreId = $this->createStore($webSiteId, $globalStoreGroupId, $this->gbpStoreCode, 'GBP', 'GBP', 'GBP', 'GB', 'AU,NZ,US,CA,GB,EU', 'en_GB', 'kgs', false);
         $eurStoreId = $this->createStore($webSiteId, $globalStoreGroupId, $this->eurStoreCode, 'EUR', 'EUR', 'EUR', 'EU', 'AU,NZ,US,CA,GB,EU', 'en_US', 'kgs', false);
         $nzdStoreId = $this->createStore($webSiteId, $globalStoreGroupId, $this->nzdStoreCode, 'NZD', 'NZD', 'NZD', 'NZ', 'AU,NZ,US,CA,GB,EU', 'en_US', 'kgs', false);
 

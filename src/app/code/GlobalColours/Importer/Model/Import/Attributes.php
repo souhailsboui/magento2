@@ -162,7 +162,7 @@ class Attributes extends AbstractEntity
             $this->addRowError('AttributeSetNameIsRequired', $rowNum);
         }
 
-        if ($attributeType && ($attributeType != "select" || $attributeType != "multiselect" || $attributeType != "text" || $attributeType != "float" || $attributeType != "weight")) {
+        if ($attributeType && ($attributeType != "select" || $attributeType != "multiselect" || $attributeType != "text" || $attributeType != "float" || $attributeType != "weight" || $attributeType != "boolean")) {
             $this->addRowError('AttributeTypeIsNotValid', $rowNum);
         }
 
@@ -418,6 +418,9 @@ class Attributes extends AbstractEntity
             case 'weight':
                 return "weight";
 
+            case 'boolean':
+                return "boolean";
+
             case 'text':
                 return "text";
 
@@ -437,6 +440,9 @@ class Attributes extends AbstractEntity
 
             case 'weight':
                 return "decimal";
+
+            case 'boolean':
+                return "int";
 
             default:
                 return "text";
