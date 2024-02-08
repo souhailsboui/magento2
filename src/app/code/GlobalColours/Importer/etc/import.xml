@@ -1,5 +1,0 @@
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_ImportExport:etc/import.xsd">
-    <entity name="attribute_values" label="Attribute values" model="GlobalColours\Importer\Model\Import\AttributeValues" behaviorModel="Magento\ImportExport\Model\Source\Import\Behavior\Basic" />
-    <entity name="attributes" label="Attributes" model="GlobalColours\Importer\Model\Import\Attributes" behaviorModel="Magento\ImportExport\Model\Source\Import\Behavior\Basic" />
-    <entity name="orders" label="Orders" model="GlobalColours\Importer\Model\Import\Orders" behaviorModel="Magento\ImportExport\Model\Source\Import\Behavior\Basic" />
-</config>

@@ -1,6 +1,0 @@
-<?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
-    <menu>
-        <add id="Meetanshi_ShippingRules::rule"  title="Shipping Rules" module="Meetanshi_ShippingRules" sortOrder="40" parent="Magento_Sales::sales_operation" action="shippingrules/rule/" resource="Meetanshi_ShippingRules::rule"/>
-    </menu>
-</config>

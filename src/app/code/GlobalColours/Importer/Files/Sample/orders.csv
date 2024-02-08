@@ -1,2 +1,0 @@
-external_id,order_status,order_currency,customer_note,billing_first_name,billing_last_name,billing_street,billing_city,billing_postcode,billing_country,billing_region,customer_email,billing_phone,shipping_first_name,shipping_last_name,shipping_street,shipping_city,shipping_postcode,shipping_country,shipping_region,item_sku,quantity,total_price,payment_method,shipping_method
-123,completed,AUD,,John,Doe,test Street,Test,1234,AU,NSW,johndoe@test.com,5555555,John,Doe,test Street,test,1234,AU,VIC,JRB3,1,2.50,paypal,local_pickup
