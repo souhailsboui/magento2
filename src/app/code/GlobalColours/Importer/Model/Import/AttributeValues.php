@@ -210,7 +210,7 @@ class AttributeValues extends AbstractEntity
     {
         $behavior = $this->getBehavior();
         $rows = [];
-        while ($bunch = $this->_dataSourceModel->getNextUniqueBunch($this->getIds())) {
+        while ($bunch = $this->_dataSourceModel->getNextBunch()) {
             $entityList = [];
 
             foreach ($bunch as $rowNum => $row) {

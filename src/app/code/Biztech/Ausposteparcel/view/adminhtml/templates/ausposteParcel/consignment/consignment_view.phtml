@@ -1,0 +1,864 @@
+<?php
+$params = $this->getRequest()->getParams();
+
+/* Define and get collection and load default article type data */
+
+$articleCollection = $block->getArticleCollection();
+
+
+$articleWeight = 0;
+$articleHeight = 0;
+$articleWidth = 0;
+$articleLength = 0;
+$oldWeight = 0;
+$oldHeight = 0;
+$oldWidth = 0;
+$oldLength = 0;
+
+/* Complete article type here */
+
+$dimensionsattr = $block->getDimentions();
+$allowdefaultdimentions = $block->useDefaultDimentions();
+$defualtdimensionsattr = $block->useDefaultDimentionsvalue();
+$getDefaultWeight = $block->getDefaultWeight();
+
+/* Get current order id and get order products details */
+$orderId = $block->getOrder()->getId();
+$orderData = $block->getOrderInfo($orderId);
+
+$eparcelShippingId = $orderData->getData('eparcel_shipping_id');
+$increamentId = $orderData->getData('increment_id');
+$isAddressValid = $orderData->getData('is_address_valid');
+$addressId = $orderData->getData('shipping_address_id');
+$consignmentId = $this->getRequest()->getParam('consignment_number');
+$getorderdata = $orderData->getData();
+$orderItems = $orderData->getAllItems();
+
+$itemIndex = 0;
+foreach ($orderItems as $orderItem) {
+
+    $orderProductId = $orderItem->getData('product_id');
+    $orderProductQty = $orderItem->getData('qty_ordered');
+
+    if ($orderProductQty > 0) {
+        $addQtyLevel = $orderProductQty;
+    } else {
+        $addQtyLevel = 1;
+    }
+
+    $productCollection = $block->getProductInfo($orderProductId);
+    
+    /* Do not allow configurable product to as the dimensions can be differ for its simple products */
+    if ($orderItem->getHasChildren() || $orderItem->getTypeId() == "configurable") {
+        continue;
+    }
+
+    if ($productCollection->getTypeId() == "bundle" && $productCollection->isShipSeparately()) {
+        continue;
+    }
+
+    /* Do not allow simple products of bundle product */
+    if ($productCollection->getParentItem()) {
+        if ($productCollection->getParentItem()->getProduct()->getTypeId() == "bundle" && !$productCollection->isShipSeparately()) {
+            continue;
+        }
+    }
+
+    $weight = (is_null($productCollection->getWeight())) ? $getDefaultWeight : number_format($productCollection->getWeight(), 2, '.', '');
+    $height = $productCollection->getData($dimensionsattr['height_attr']);
+    $width = $productCollection->getData($dimensionsattr['width_attr']);
+    $length = $productCollection->getData($dimensionsattr['length_attr']);
+
+    if ($allowdefaultdimentions) {
+        $height = (!is_null($productCollection->getData($dimensionsattr['height_attr']))) ? $productCollection->getData($dimensionsattr['height_attr']) : $defualtdimensionsattr["height_attr_default"];
+        $width = (!is_null($productCollection->getData($dimensionsattr['width_attr']))) ? $productCollection->getData($dimensionsattr['width_attr']): $defualtdimensionsattr["width_attr_default"];
+        $length = (!is_null($productCollection->getData($dimensionsattr['length_attr']))) ? $productCollection->getData($dimensionsattr['length_attr']) : $defualtdimensionsattr["length_attr_default"];
+    }
+    if (!$weight) {
+        $weight = $articleWeight;
+    }
+    if (!$height) {
+        $height = $articleHeight;
+    }
+    if (!$width) {
+        $width = $articleWidth;
+    }
+    if (!$length) {
+        $length = $articleLength;
+    }
+
+    for ($i = 1; $i <= $orderProductQty; $i++) {
+        $boxes[$orderProductId] = [
+            'length' => $length,
+            'width' => $width,
+            'height' => $height
+        ];
+        $boxes1[] = [
+            'length' => $length,
+            'width' => $width,
+            'height' => $height
+        ];
+
+        $itemIndex++;
+    }
+
+    $oldWeight = $oldWeight + $weight * $addQtyLevel;
+}
+if (!empty($boxes1) && !empty($boxes)) {
+    if ($itemIndex == 1) {
+            
+        $oldHeight = $boxes1[0]['height'];
+        $oldWidth = $boxes1[0]['width'];
+        $oldLength = $boxes1[0]['length'];
+    } else {
+        $c_size = $block->createbox($boxes1);
+        $oldLength = $c_size['length'];
+        $oldWidth = $c_size['width'];
+        $oldHeight = $c_size['height'];
+    }
+
+}
+
+$consignments = $block->getConsignments($this->getOrder()->getId());
+/* Complete order details and products items here */
+?>
+<div class="content-header ad-header">
+    <h3 class="icon-head head-sales-order-invoice ad-title">
+        <?php
+        if ($this->getRequest()->getParam('consignment_number')) {
+            echo __('View Consignment #%1 for order #' . $increamentId, $this->getRequest()->getParam('consignment_number'));
+        } else {
+            echo __('Create Consignment for Order # ' . $increamentId);
+        }
+        ?>
+    </h3>
+    <p class="form-buttons ad-form-buttons">
+        <button   onclick="setLocation('<?php echo $this->getBackUrl(); ?>')" class="scalable back" type="button"
+                  title="Back">
+            <span><span><span>Back</span></span></span>
+        </button>
+        <?php if (!$this->getRequest()->getParam('consignment_number') && empty($consignments)) { ?>
+        <button   onclick="setLocation(window.location.href)" class="scalable " type="button" title="Reset">
+            <span><span><span>Reset</span></span></span>
+        </button>
+    <?php } ?>
+    </p>
+</div>
+
+<div class="entry-edit" id="eparcel_sales_order_view">
+    <form name="edit_form" id="edit_form" method="post" action="<?php echo $this->getUrl('biztech_ausposteparcel/consignment/save/'); ?>">
+        <?php echo $this->getBlockHtml('formkey') ?>
+        <input id="order_id" type="hidden" name="order_id" value="<?php echo $this->getOrder()->getId() ?>"/>    
+        
+        <?php
+        $consignments = $block->eparcelInfo()->getConsignments($this->getOrder()->getId());
+        if (empty($consignments)): ?>
+        <div class="box" id="articletypes">       
+            <div class="ad-form-group">       
+                <!-- <label class="ad-control-label">Articles :-</label>  -->
+                <div class="ad-form-control">
+                    <input type="hidden" id="number_of_articles" name="number_of_articles" size="4" value="1" class="validate-number"/>
+                </div>
+            </div>
+            <div class="ad-form-group">       
+                <label class="ad-control-label">Articles Type:-</label> 
+                <div class="ad-form-control">
+                    <select id="articles_type" name="articles_type" class="required-entry2 select admin__control-select" style="width : 100%" >
+                        <?php foreach ($articleCollection->getData() as $articles): ?>                
+                            <option value="<?php echo $articles['id'] . "<=>" . $articles['name'] . "<=>" . $articles['weight'] . "<=>" . $articles['height'] . "<=>" . $articles['width'] . "<=>" . $articles['length']; ?>"><?php echo $articles['name'] . " ( " . $articles['weight'] . "Kg - " . $articles['height'] . " x" . $articles['width'] . " x" . $articles['length'] . ")"; ?></option>
+                        <?php endforeach; ?>
+                        <option value="Custom">Custom</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <span class="field-row1">
+                    <label class="normal" for="unit_value">
+                        Unit Value :- 
+                    </label>
+                    <input size="10" id="article_unit_value" class="positive-number input-text admin__control-text" label="Unit Value" name="unit_value" value="1" />
+                </span>
+            </div>
+           
+            <button onclick="return submitForm2()" class="scalable save submit-button" type="button" title="Submit">
+                <span><span><span>Create Consignment</span></span></span>
+            </button>
+        </div>
+        <?php endif; ?>
+        <div class="box custom_articles_template" style="display:none">
+            <h3>Article</h3>
+            <span class="field-row1">
+                <label class="normal" for="article_description">
+                    <?php echo 'Description:'; ?><span class="required">*</span>
+                </label>
+                <input id="article_description" name="article[description]" class="required-entry input-text admin__control-text"
+                       value="Article"/>
+            </span>
+            <span class="field-row1">
+                <label class="normal" for="article_weight">
+                    <?php echo 'Weight (Kgs):'; ?><span class="required">*</span>
+                </label>
+                <input size="10" id="article_weight" name="article[weight]"
+                       class="required-entry positive-number input-text admin__control-text" label="Weight"
+                       value="<?php echo $oldWeight; ?>" data-validate="{required:true}" />
+            </span>
+            <span class="field-row1">
+                <label class="normal" for="article_height">
+                    <?php echo 'Height (cm):'; ?>
+                </label>
+                <input size="10" id="article_height" class="positive-number input-text admin__control-text"
+                       label="Height" name="article[height]"
+                       value="<?php echo $oldHeight; ?>" class="required-entry"/>
+            </span>
+            <span class="field-row1">
+                <label class="normal" for="article_width">
+                    <?php echo 'Width (cm):'; ?>
+                </label>
+                <input size="10" id="article_width" class="positive-number input-text admin__control-text"
+                       label="Width" name="article[width]"
+                       value="<?php echo $oldWidth; ?>" class="required-entry" />
+            </span>
+            <span class="field-row1">
+                <label class="normal" for="article_length">
+                    <?php echo 'Length (cm):'; ?>
+                </label>
+                <input size="10" id="article_length" class="positive-number input-text admin__control-text"
+                       label="Length" name="article[length]"
+                       value="<?php echo $oldLength; ?>" class="required-entry" />
+            </span>
+            <span class="field-row1">
+                <label class="normal" for="unit_value">
+                    <?php echo 'Unit Value:'; ?>
+                </label>
+                <input size="10" id="article_unit_value" class="positive-number input-text admin__control-text"
+                       label="unit_value" name="article[unit_value]" value="1" />
+            </span>
+        </div>
+        <div id="custom_articles" style="display:none;">
+            <div id="custom_articles_container">
+            </div>
+            <button onclick="backToArticletype()" class="scalable back backToArticletype" type="button"
+                    title="Back">
+                <span><span><span>Back to Article Type</span></span></span>
+            </button>
+            <?php if (!is_null($consignments)): ?>
+                <?php if (count($consignments) == 0): ?>
+                    <button onclick="return submitForm()" class="scalable save submit-button" type="button" title="Submit">
+                        <span><span><span>Create Consignment</span></span></span></button>
+                <?php endif; ?>
+            <?php endif;?>
+        </div>
+        <?php if ($consignmentId == null): ?>
+            <?php if ($this->getOrder()->getStatus() != 'complete' || $consignmentId == null): ?>
+                <div>
+                    <br/>
+                    <a href="javascript:void(0)" class="edit-consignments-defaults" ><span>Show Default Consignment Settings</span></a>
+                    <br/>
+                    <br/>
+                </div>
+            <?php endif; ?>
+        <?php endif; ?>
+        <div class="box consignment-fields" style="display:none">
+            <h3>Consignment Fields</h3>
+            <table width="100%" border="0" cellspacing="6" cellpadding="6" class="tablecustom ad-table">
+                <tr>
+                    <td width="30%"><?php echo __('Allow Partial Delivery') ?></td>
+                    <td>
+
+                        <?php if ($this->helper('Biztech\Ausposteparcel\Helper\Info')->isDisablePartialDeliveryMethod($this->getOrder()->getId())): ?>
+                            <select id="partial_delivery_allowed" class="select admin__control-select" style="width : 100%" name="partial_delivery_allowed"
+                                    disabled="disabled" >
+                                <option value="0">No</option>
+                            </select>
+                        <?php else: ?>
+                            <select id="partial_delivery_allowed" class="select admin__control-select" style="width : 100%" name="partial_delivery_allowed">
+                                <option                          
+                                    value="1" <?php echo($block->getValue('carriers/ausposteParcel/partialDeliveryAllowed') == 1 ? 'selected' : '') ?>>
+                                    Yes
+                                </option>
+                                <option
+                                    value="0" <?php echo($block->getValue('carriers/ausposteParcel/partialDeliveryAllowed') != 1 ? 'selected' : '') ?>>
+                                    No
+                                </option>
+                            </select>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+
+                <?php if ($this->helper('Biztech\Ausposteparcel\Helper\Info')->isCashToCollect($this->getOrder()->getId())): ?>
+                    <tr>
+                        <td><?php echo __('Cash to collect') ?></td>
+                        <td><input id="cash_to_collect" name="cash_to_collect"/></td>
+                    </tr>
+                <?php endif; ?>
+
+                <tr>
+                    <td><?php echo __('Enable Delivery Signature') ?></td>
+                    <td><select id="delivery_signature_allowed"  class="select admin__control-select" style="width : 100%" name="delivery_signature_allowed">
+                            <option
+
+                                value="1" <?php echo($block->getValue('carriers/ausposteParcel/signatureRequired') == 1 ? 'selected' : '') ?>>
+                                Yes
+                            </option>
+                            <option
+                                value="0" <?php echo($block->getValue('carriers/ausposteParcel/signatureRequired') != 1 ? 'selected' : '') ?>>
+                                No
+                            </option>
+                        </select></td>
+                </tr>
+                <tr>
+                    <td><?php echo __('Enable Transit Cover Amount') ?></td>
+                    <td><select id="transit_cover_required" class="select admin__control-select" style="width : 100%" name="transit_cover_required">
+                            <option
+
+                                value="1" <?php echo($block->getValue('carriers/ausposteParcel/insurance') == 1 ? 'selected' : '') ?>>
+                                Yes
+                            </option>
+                            <option
+                                value="0" <?php echo($block->getValue('carriers/ausposteParcel/insurance') != 1 ? 'selected' : '') ?>>
+                                No
+                            </option>
+                        </select></td>
+                </tr>
+                <tr>
+                    <td><?php echo __('Transit Cover Amount') ?></td>
+                    <td><input id="transit_cover_amount" class="positive-number input-text admin__control-text" style="width: 100%" label="Transit Cover Amount"
+                               name="transit_cover_amount"
+                               value="<?php echo $block->getValue('carriers/ausposteParcel/defaultInsuranceValue'); ?>"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td><?php echo __('Is Shipment Contains Dangerous Goods ?') ?></td>
+                    <td><select id="contains_dangerous_goods"  class="select admin__control-select" style="width : 100%" name="contains_dangerous_goods">
+                            <option value="1">Yes</option>
+                            <option value="0" selected>No</option>
+                        </select></td>
+                </tr>
+                <tr>
+                    <td><?php echo __('Print Return Labels') ?></td>
+                    <td><select id="print_return_labels" class="select admin__control-select" style="width : 100%" name="print_return_labels">
+                            <option
+
+                                value="1" <?php echo($block->getValue('carriers/ausposteParcel/printReturnLabels') == 1 ? 'selected' : '') ?>>
+                                Yes
+                            </option>
+                            <option
+                                value="0" <?php echo($block->getValue('carriers/ausposteParcel/printReturnLabels') != 1 ? 'selected' : '') ?>>
+                                No
+                            </option>
+                        </select></td>
+                </tr>
+                <tr>
+                    <td><?php echo __('Australia Post Email Notification') ?></td>
+                    <td><select id="email_notification" class="select admin__control-select" style="width : 100%" name="email_notification" >
+                            <option
+
+                                value="1" <?php echo($block->getValue('carriers/ausposteParcel/emailNotification') == 1 ? 'selected' : '') ?>>
+                                Yes
+                            </option>
+                            <option
+                                value="0" <?php echo($block->getValue('carriers/ausposteParcel/emailNotification') != 1 ? 'selected' : '') ?>>
+                                No
+                            </option>
+                        </select></td>
+                </tr>
+                <tr>
+                    <td><?php echo __('Notify Customers on dispatch of Manifest') ?></td>
+                    <td><select id="notify_customers" class="select admin__control-select" style="width : 100%" name="notify_customers">
+                            <option
+
+                                value="1" <?php echo($block->getValue('carriers/ausposteParcel/notifyCustomers') == 1 ? 'selected' : '') ?>>
+                                Yes
+                            </option>
+                            <option
+                                value="0" <?php echo($block->getValue('carriers/ausposteParcel/notifyCustomers') != 1 ? 'selected' : '') ?>>
+                                No
+                            </option>
+                        </select></td>
+                </tr>
+                <tr>
+                    <td><?php echo __('Delivery Instructions') ?></td>
+                    <td><textarea  placeholder="Please enter delivery instructions if any..." id="delivery_instructions" name="delivery_instructions" class=" textarea admin__control-textarea" rows="5" cols="15" style="width : 100%" ></textarea></td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>
+
+
+<?php
+$consignments = $block->eparcelInfo()->getConsignments($this->getOrder()->getId());
+$priceHelper = $block->getPriceHelper();
+if ($consignments && count($consignments) > 0) {
+    
+}
+?>
+<?php
+foreach ($consignments as $consignment): ?>
+    <?php
+    /*if($consignment['consignment_number'] == "0"){
+        $articles = $block($this->getOrder()->getId(),0);
+    }
+    else{*/
+        
+        $articles = $block->eparcelInfo()->getArticles($this->getOrder()->getId(), $consignment['consignment_number']);
+    //}
+    ?>
+    <br/>
+    <div class="clear"></div>
+    <div class="entry-edit">
+        <div class="entry-edit-head ad-header" >
+            <h4 class="icon-head head-products ad-title">
+                Consignment: 
+                <?php if ($consignment['eparcel_consignment_id'] != ""): ?>
+                    <?php echo $consignment['eparcel_consignment_id']; ?>
+                <?php else: ?>
+                    <?php echo $consignment['consignment_number'] ?>
+                <?php endif; ?>
+                
+                <?php if ($consignment['despatched']): ?>
+                    (Dispatched) - <a
+                        href="<?php echo $this->getUrl('biztech_ausposteparcel/manifestconsignments/index', ['manifest' => $consignment['manifest_number']]) ?>">Manifest <?php echo $consignment['manifest_number'] ?></a>
+                <?php endif; ?>
+            </h4>
+            <span class="ad-form-buttons">
+                <?php if (isset($eparcelShippingId) && $eparcelShippingId != ''): ?>
+                    <a class="track_link" target="_blank"
+                       href="http://auspost.com.au/track/track.html?id=<?php echo $consignment['eparcel_consignment_id'] ?>"
+                       type="button" title="Track">
+                        <button>Track</button>
+                    </a>
+                <?php endif; ?>
+
+                <?php if (!empty($consignment['label'])): ?>
+                    <a class="button print_label"
+                       lang="<?php echo $consignment['consignment_number'] ?>" target="_blank"
+                       href="<?php echo $this->getConsignmentLabelUrl() . $consignment['label'] . '?' . time() ?>"
+                       type="button" title="Print Label">
+                        <span><span><span>
+                                    <button> <?php echo($consignment['is_label_printed'] ? 'Reprint' : 'Print'); ?> Label
+                                    </button> </span></span></span>
+                    </a>
+                    &nbsp;
+                <?php else: ?>
+                    <?php if (isset($eparcelShippingId)  && $eparcelShippingId != ''): ?>
+                        <button
+                            onclick="setLocation('<?php echo $this->getConsignmentLabelCreateUrl($consignment['consignment_number']) ?>')"
+                            type="button" title="Get Label">
+                            <span><span><span>Get Label</span></span></span>
+                        </button>
+                    <?php endif; ?>
+                <?php endif; ?>
+                <?php if (!$eparcelShippingId) { ?>
+                     &nbsp;
+                     <button style=""
+                            onclick="setLocation('<?php echo $this->getOrderAddressUrl($params['order_id']) ?>')"
+                            type="button" title="Update Address">
+                        <span>Update Address</span>
+                    </button>
+                <?php } ?>
+                <?php if ($consignment['despatched'] == 0 && isset($eparcelShippingId)  && $eparcelShippingId != '') { ?>
+                    <?php /*<button style=""
+                            onclick="setLocation('<?php echo $this->getConsignmentEditUrl($consignment['consignment_number'], 1) ?>')"
+                            type="button" title="Update Article">
+                        <span>Update Consignment</span>
+                    </button>*/ ?>
+                    <?php /*<button style=""
+                            onclick="setLocation('<?php echo $this->getSubmitUpdatedConsignmentUrl($consignment['consignment_number']) ?>')"
+                            type="button" title="Submit Updated Consignment">
+                        <span>Submit Updated Consignment</span>
+                    </button>*/ ?>
+                <?php } ?>
+            </span>
+            <?php if ($consignment['print_return_labels']): ?>
+                <?php if ($this->isReturnLabelFileExists($consignment['consignment_number'])): ?>
+                    <a
+                        class="button print_return_label <?php echo($consignment['is_return_label_printed'] ? 'printed' : ''); ?>"
+                        lang="<?php echo $consignment['consignment_number'] ?>" target="_blank"
+                        href="<?php echo $this->getConsignmentReturnLabelUrl() . $consignment['consignment_number'] . '.pdf?' . time() ?>"
+                        type="button" title="Print Label">
+                        <span><span><span>
+                                    <?php echo($consignment['is_return_label_printed'] ? 'Reprint' : 'Print'); ?> Return Label
+                                </span></span></span>
+                    </a>
+                    &nbsp;
+                <?php else: /* ?>
+                  <!-- <button
+                  onclick="setLocation('<?php echo $this->getConsignmentReturnLabelCreateUrl($consignment['consignment_number']) ?>')"
+                  type="button" title="Create Return Label">
+                  <span><span><span>Create Return Label</span></span></span>
+                  </button> -->
+                  <?php */
+                endif; ?>
+            <?php endif; ?>
+            <?php //if (!$consignment['despatched']):   ?>
+            <?php if (!$eparcelShippingId): ?>
+                <div class="ad-form-buttons">
+                    <?php if (count($articles) < 20 && $consignment['weight'] < $block->eparcelInfo()->getOrderWeight($this->getOrder())): ?>
+                        <button
+                            onclick="setLocation('<?php echo $this->getArticleAddUrl($consignment['consignment_number']) ?>')"
+                            type="button" title="Add Articles">
+                            <span><span><span>Add Article</span></span></span>
+                        </button>
+                    <?php endif; ?>
+                    <?php //endif;   ?>
+                    <?php if (!$eparcelShippingId): ?>  
+                        <button  
+                            onclick="setLocation('<?php echo $this->getConsignmentSubmitUrl($consignment['consignment_number']) ?>')"
+                            type="button" title="Submit Consignment">
+                            <span><span><span>Submit Consignment</span></span></span>
+                        </button>
+                        <?php /*<button
+                            onclick="setLocation('<?php echo $this->getConsignmentEditUrl($consignment['consignment_number']) ?>')"
+                            type="button" title="Edit Consignment">
+                            <span><span><span>Edit Consignment</span></span></span>
+                        </button> */ ?>
+
+                        <button  style="margin-left: 4px;"
+                            onclick="setLocationConfirmDialog('<?php echo $this->getConsignmentDeleteUrl($consignment['consignment_number']) ?>')"
+                            type="button" title="Delete Consignment">
+                            <span><span><span>Delete Consignment</span></span></span>
+                        </button>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+        </div>
+        <div class="box">
+            <table width="100%" border="0" cellspacing="6" cellpadding="6" class="tablecustom ad-table">
+                <tr>
+                    <td width="20%"><?php echo (__('Allow Partial Delivery')); ?></td>
+                    <td><?php echo($consignment['partial_delivery_allowed'] == 1 ? 'Yes' : 'No') ?></td>
+                </tr>
+                <?php if ($block->eparcelInfo()->isCashToCollect($orderId)): ?>
+                    <tr>
+                        <td><?php echo (__('Cash to collect')); ?></td>
+                        <td><?php echo $consignment['cash_to_collect'] ?></td>
+                    </tr>
+                <?php endif; ?>
+                <tr>
+                    <td><?php echo (__('Enable Delivery Signature')); ?></td>
+                    <td><?php echo($consignment['delivery_signature_allowed'] == 1 ? 'Yes' : 'No') ?></td>
+                </tr>
+                <tr>
+                    <td><?php echo (__('Is Shipment Contains Dangerous Goods ?')); ?></td>
+                    <td><?php echo($consignment['contains_dangerous_goods'] == 1 ? 'Yes' : 'No') ?></td>
+                </tr>
+                <tr>
+                    <td><?php echo (__('Print Return Labels')); ?></td>
+                    <td><?php echo($consignment['print_return_labels'] == 1 ? 'Yes' : 'No') ?></td>
+                </tr>
+                <tr>
+                    <td><?php echo (__('Australia Post Email Notification')); ?></td>
+                    <td><?php echo($consignment['email_notification'] == 1 ? 'Yes' : 'No') ?></td>
+                </tr>
+                <tr>
+                    <td><?php echo (__('Notify Customers on dispatch of Manifest')); ?></td>
+                    <td><?php echo($consignment['notify_customers'] == 1 ? 'Yes' : 'No') ?></td>
+                </tr>
+                <tr>
+                    <td><?php echo (__('Delivery Instructions')); ?></td>
+                    <td><?php echo($consignment['delivery_instructions'] == null ? 'N/A' : $consignment['delivery_instructions']) ?></td>
+                </tr>
+            </table>
+            <div class="grid np">
+                <div class="hor-scroll">
+                    <table cellspacing="0" class="data order-tables ad-table">
+                        <colgroup>
+                            <col width="1">
+                            <col width="1">
+                            <col width="1">
+                            <col width="1">
+                            <col width="1">
+                            <col width="1">
+                            <col width="1">
+                        </colgroup>
+                        <thead>
+                            <tr class="headings">
+                                <th>Article Number</th>
+                                <th>Description</th>
+                                <th class="a-center">Weight (Kgs)</th>
+                                <th class="a-center">Height (cm)</th>
+                                <th class="a-center">Width (cm)</th>
+                                <th class="a-center">Length (cm)</th>
+                                <th class="a-center">Transit Cover</th>
+                                <th class="a-right">Transit Value</th>
+                                <th class="a-right">Unit Value</th>
+                                <th class="a-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="even">
+                            <?php foreach ($articles as $article): ?>
+                                <tr class="border">
+                                    <?php if ($article['eparcel_article_id'] != ""): ?>
+                                        <td class="a-left"><?php echo $article['eparcel_article_id'] ?></td>
+                                    <?php else: ?>
+                                        <td class="a-left"><?php echo $article['article_number'] ?></td>
+                                    <?php endif; ?>
+                                    <td class="a-left"><?php echo $article['article_description'] ?></td>
+                                    <td class="a-center"><?php echo $article['actual_weight'] ?></td>
+                                    <td class="a-center"><?php echo $article['height'] ?></td>
+                                    <td class="a-center"><?php echo $article['width'] ?></td>
+                                    <td class="a-center"><?php echo $article['length'] ?></td>
+                                    <td class="a-center"><?php echo $article['is_transit_cover_required'] ?></td>
+                                    <td class="a-right"><?php echo(is_numeric($article['transit_cover_amount']) ? $priceHelper->currency($article['transit_cover_amount'], true, false) : 'NA') ?></td>
+                                    <?php
+                                    if (!$article['unit_value']) {
+                                        $article['unit_value'] = 1;
+                                    }
+                                    ?>
+
+                                    <td class="a-right"><?php echo $priceHelper->currency($article['unit_value'], true); ?></td>
+                                    <td class="a-right">
+                                        <?php //if (!$consignment['despatched']):  ?>
+                                        <?php if (!$eparcelShippingId): ?>
+                                            <button  
+                                                onclick="setLocation('<?php echo $this->getArticleEditUrl($consignment['consignment_number'], $article['article_number']) ?>')"
+                                                type="button" title="Edit">
+                                                <span><span><span>Edit</span></span></span>
+                                            </button>
+                                            <button  
+                                                onclick="setLocationConfirmDialog('<?php echo $this->getArticleDeleteUrl($consignment['consignment_number'], $article['article_number']) ?>')"
+                                                type="button" title="Delete">
+                                                <span><span><span>Delete</span></span></span>
+                                            </button>
+                                        <?php else: ?>
+                                            N/A
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="clear"></div>
+    </div>
+<?php endforeach; ?>
+<script type="text/javascript">
+    require([
+        'jquery',
+    ], function ($) {
+        $jEparcel = jQuery.noConflict();
+    });
+    function backToArticletype() {
+//        jQuery('#articletypes').setStyle({display: "block"});
+        jQuery('#articletypes').show();
+        jQuery('#custom_articles').hide();
+        jQuery('#custom_articles_container').html('');
+        jQuery('#articles_type').val(jQuery('#articles_type > option:first').attr('value'));
+    }
+    function setLocationConfirmDialog(url) {
+        if (!confirm('Are you sure you want to do delete consignment?'))
+            return false;
+        setLocation(url);
+    }
+
+    function submitForm() {
+        var valid = true;
+
+        var value = $jEparcel.trim($jEparcel('#articles_type').val());
+        if (value.length == 0 && valid) {
+            valid = false;
+            alert('Please select article type');
+            return false;
+        }
+
+        $jEparcel('#custom_articles_container .required-entry').each(function () {
+            var value = $jEparcel.trim($jEparcel(this).val());
+            if (value.length == 0 && valid) {
+                valid = false;
+            }
+        });
+        if (!valid) {
+            alert('Please enter/select all the mandatory fields');
+            return false;
+        }
+
+        $jEparcel('.positive-number').each(function () {
+            var value = $jEparcel.trim($jEparcel(this).val());
+            var label = $jEparcel(this).attr('label');
+            if (isNaN(value)) {
+                alert(label + ' should be a number');
+                valid = false;
+            }
+
+            value = parseInt(value);
+            if (value < 0) {
+                alert(label + ' should be a postive number');
+                valid = false;
+            }
+
+        });
+
+        if (valid) {
+            jQuery('#edit_form').submit()
+        } else {
+            return false;
+        }
+    }
+
+    function submitForm2() {
+        var valid = true;
+
+        var value = $jEparcel.trim($jEparcel('#articles_type').val());
+        if (value.length == 0 && valid) {
+            valid = false;
+            alert('Please select article type');
+            return false;
+        }
+
+        $jEparcel('.required-entry2').each(function () {
+            var value = $jEparcel.trim($jEparcel(this).val());
+            if (value.length == 0 && valid) {
+                valid = false;
+            }
+        });
+        if (!valid) {
+            alert('Please enter/select all the mandatory fields');
+            return false;
+        }
+
+        if (valid) {
+            jQuery('#edit_form').submit()
+        } else {
+            return false;
+        }
+    }
+    require([
+        'jquery',
+        'jquery/ui',
+        'Magento_Ui/js/modal/modal'
+    ], function ($) {
+        $jEparcel = jQuery.noConflict();
+        $jEparcel(document).ready(function () {
+            $jEparcel('.print_label').click(function () {
+                var consignmentNumber = $jEparcel(this).attr('lang');
+                // var ajaxCaller = '<?php //echo $this->getUrl('ausposteParcel/index/updateLabelAsPrinted/')                               ?>consignmentNumber/' + consignmentNumber;
+                $jEparcel.ajax({
+                    type: "POST",
+                    url: ajaxCaller,
+                    success: function (data) {
+                        ;
+                    }
+                });
+            });
+
+            $jEparcel('.edit-consignments-defaults').click(function () {
+                $jEparcel('.consignment-fields').slideToggle();
+                if($jEparcel('.edit-consignments-defaults').html() == "<span>Show Default Consignment Settings</span>"){
+                    $jEparcel('.edit-consignments-defaults').html("<span>Hide Default Consignment Settings</span>");
+                }else{
+                    $jEparcel('.edit-consignments-defaults').html("<span>Show Default Consignment Settings</span>");
+                }
+            });
+
+            $jEparcel('#number_of_articles').blur(function () {
+                var value = $jEparcel.trim($jEparcel(this).val());
+
+                if (value.length == 0) {
+                    alert('Articles should not be empty');
+                    $jEparcel(this).val(1);
+                }
+                if (isNaN(value)) {
+                    alert('Articles should be a number');
+                    $jEparcel(this).val(1);
+                }
+
+                value = parseInt(value);
+                if (value < 0) {
+                    alert('Articles should be a postive number');
+                    $jEparcel(this).val(1);
+                }
+
+                if (value > 100) {
+                    alert('Articles can be 1-100 per request');
+                    $jEparcel(this).val(1);
+                }
+
+                if ($jEparcel('#articles_type > option').length == 1) {
+                    var number_of_articles = $jEparcel('#number_of_articles').val();
+                    var boxes = $jEparcel('#custom_articles_container > div.box').length;
+                    if (boxes > number_of_articles) {
+                        for (; boxes > number_of_articles; boxes--) {
+                            $jEparcel('#custom_articles_container > div.box:nth-child(' + boxes + ')').remove();
+                        }
+                    } else {
+                        var i = 1;
+                        i = i + boxes;
+                        for (; i <= number_of_articles; i++) {
+                            var box = $jEparcel('.custom_articles_template').clone();
+                            box.removeClass('custom_articles_template');
+                            box.find('h3').html(box.find('h3').html() + ' ' + i);
+                            box.find('#article_description').attr('name', 'article' + i + '[description]');
+                            box.find('#article_description').val(box.find('#article_description').val() + ' ' + i);
+                            box.find('#article_weight').attr('name', 'article' + i + '[weight]');
+                            box.find('#article_height').attr('name', 'article' + i + '[height]');
+                            box.find('#article_width').attr('name', 'article' + i + '[width]');
+                            box.find('#article_length').attr('name', 'article' + i + '[length]');
+                            box.find('#article_unit_value').attr('name', 'article' + i + '[unit_value]');
+                            box.show();
+                            $jEparcel('#custom_articles_container').append(box);
+                        }
+                    }
+                }
+            });
+
+            if ($jEparcel('#articles_type').val() == 'Custom') {
+                $jEparcel('.create-consignment1').hide();
+                $jEparcel('.backToArticletype').hide();
+                $jEparcel('#custom_articles').show();
+
+                var number_of_articles = $jEparcel('#number_of_articles').val();
+                for (var i = 1; i <= number_of_articles; i++) {
+                    var box = $jEparcel('.custom_articles_template').clone();
+                    box.removeClass('custom_articles_template');
+                    box.find('h3').html(box.find('h3').html() + ' ' + i);
+                    box.find('#article_description').attr('name', 'article' + i + '[description]');
+                    box.find('#article_description').val(box.find('#article_description').val() + ' ' + i);
+                    box.find('#article_weight').attr('name', 'article' + i + '[weight]');
+                    box.find('#article_height').attr('name', 'article' + i + '[height]');
+                    box.find('#article_width').attr('name', 'article' + i + '[width]');
+                    box.find('#article_length').attr('name', 'article' + i + '[length]');
+                    box.find('#article_unit_value').attr('name', 'article' + i + '[unit_value]');
+                    box.show();
+                    $jEparcel('#custom_articles_container').append(box);
+                }
+            }
+
+            $jEparcel('#articles_type').change(function () {
+                if ($jEparcel(this).val() == 'Custom') {
+                    $jEparcel('#articletypes').hide();
+                    $jEparcel('#custom_articles').show();
+
+                    var number_of_articles = $jEparcel('#number_of_articles').val();
+                    for (var i = 1; i <= number_of_articles; i++) {
+                        var box = $jEparcel('.custom_articles_template').clone();
+                        box.removeClass('custom_articles_template');
+                        box.find('h3').html(box.find('h3').html() + ' ' + i);
+                        box.find('#article_description').attr('name', 'article' + i + '[description]');
+                        box.find('#article_description').val(box.find('#article_description').val() + ' ' + i);
+                        box.find('#article_weight').attr('name', 'article' + i + '[weight]');
+                        box.find('#article_height').attr('name', 'article' + i + '[height]');
+                        box.find('#article_width').attr('name', 'article' + i + '[width]');
+                        box.find('#article_length').attr('name', 'article' + i + '[length]');
+                        box.find('#article_unit_value').attr('name', 'article' + i + '[unit_value]');
+                        box.show();
+                        $jEparcel('#custom_articles_container').append(box);
+                    }
+                } else {
+                    $jEparcel('#articletypes').show();
+                    // $jEparcel('#custom_articles').hide();
+                    $jEparcel('#custom_articles_container').html('');
+                }
+            });
+        });
+    });
+</script>
+<script type="text/x-magento-init">
+    {
+    "#edit-form": {
+    "validation": {}
+    }
+    }
+</script>

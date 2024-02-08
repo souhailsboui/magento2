@@ -73,5 +73,5 @@
 !/src/vendor/.htaccess
 /src/generated/*
 !/src/generated/.htaccess
-/src/auth.json
+# /src/auth.json
 .DS_Store

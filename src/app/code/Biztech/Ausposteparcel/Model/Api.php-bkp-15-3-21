@@ -1,0 +1,890 @@
+<?php
+
+namespace Biztech\Ausposteparcel\Model;
+
+if (!defined('BIZTECH_AUSPOSTEPARCEL_URL')) {
+    define('BIZTECH_AUSPOSTEPARCEL_URL', 'ws1.linksync.com');
+}
+
+class Api extends \Magento\Framework\Model\AbstractModel
+{
+    const XML_PATH_ACCOUNT_NO = 'carriers/ausposteParcel/accountNo';
+    const XML_PATH_API_KEY = 'carriers/ausposteParcel/apiKey';
+    const XML_PATH_PASSWORD = 'carriers/ausposteParcel/password';
+    const BIZTECH_ID = 'carriers/ausposteParcel/baid';
+    const SAASURL = "https://saas.biztechconsultancy.com/eparcel";
+    public $ausposteParcelLabelFactory;
+    public $logger;
+    public $scopeConfig;
+    public $encryptorInterface;
+    private $_objectManager;
+    public $ausposteParcelLabelCollectionFactory;
+    public $ausposteParcelAuspostlabelFactory;
+    public $ausposteParcelInfoHelper;
+    protected $request;
+
+    public function __construct(
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
+        \Magento\Framework\ObjectManagerInterface $objectmanager,
+        \Biztech\Ausposteparcel\Model\Cresource\AuspostlabelFactory $ausposteParcelLabelFactory,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Biztech\Ausposteparcel\Model\Cresource\Auspostlabel\CollectionFactory $ausposteParcelLabelCollectionFactory,
+        \Biztech\Ausposteparcel\Model\AuspostlabelFactory $ausposteParcelAuspostlabelFactory,
+        \Biztech\Ausposteparcel\Helper\Info $ausposteParcelInfoHelper,
+        \Magento\Framework\Encryption\EncryptorInterface $encryptorInterface,
+        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        array $data = []
+    ) {
+        $this->ausposteParcelLabelFactory = $ausposteParcelLabelFactory;
+        $this->logger = $context->getLogger();
+        $this->scopeConfig = $scopeConfig;
+        $this->encryptorInterface = $encryptorInterface;
+        $this->_objectManager = $objectmanager;
+        $this->ausposteParcelLabelCollectionFactory = $ausposteParcelLabelCollectionFactory;
+        $this->ausposteParcelAuspostlabelFactory = $ausposteParcelAuspostlabelFactory;
+        $this->ausposteParcelInfoHelper = $ausposteParcelInfoHelper;
+        parent::__construct(
+            $context,
+            $registry,
+            $resource,
+            $resourceCollection,
+            $data
+        );
+    }
+
+    public function _construct()
+    {
+        parent::_construct();
+    }
+
+    protected function flushAustpostLabel($auspostlabel)
+    {
+        try {
+            foreach ($auspostlabel as $item) {
+                $item->delete();
+            }
+            $auspostLabelModel = $this->_objectManager->create('Biztech\Ausposteparcel\Model\Cresource\Auspostlabel')->changeAutoIncrement();
+            //$this->ausposteParcelLabelFactory->create()->changeAutoIncrement();
+        } catch (\Exception $e) {
+            $this->logger->log(null, $e->getMessage());
+        }
+    }
+
+    public function seteParcelMerchantDetails()
+    {
+        $globalData = [];
+
+        /* account details */
+        $globalData['account_number'] = $this->encryptorInterface->decrypt($this->scopeConfig->getValue('carriers/ausposteParcel/accountNo', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+
+        $globalData['username'] = $this->encryptorInterface->decrypt($this->scopeConfig->getValue(self::XML_PATH_API_KEY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+
+        $globalData['password'] = $this->encryptorInterface->decrypt($this->scopeConfig->getValue(self::XML_PATH_PASSWORD, \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $operation_mode = $this->scopeConfig->getValue('carriers/ausposteParcel/operationMode', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $globalData['operation_mode'] = $operation_mode;
+
+        /* return address details */
+        $globalData['returnAddressName'] = trim($this->scopeConfig->getValue('carriers/ausposteParcel/returnAddressName', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $globalData['returnAddressLine1'] = trim($this->scopeConfig->getValue('carriers/ausposteParcel/returnAddressLine1', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $globalData['returnAddressLine2'] = trim($this->scopeConfig->getValue('carriers/ausposteParcel/returnAddressLine2', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $globalData['returnAddressLine3'] = trim($this->scopeConfig->getValue('carriers/ausposteParcel/returnAddressLine3', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $globalData['returnAddressLine4'] = trim($this->scopeConfig->getValue('carriers/ausposteParcel/returnAddressLine4', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $globalData['returnCountryCode'] = 'AU';
+        $globalData['returnPostcode'] = trim($this->scopeConfig->getValue('carriers/ausposteParcel/returnAddressPostcode', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $globalData['returnStateCode'] = trim($this->scopeConfig->getValue('carriers/ausposteParcel/returnAddressStateCode', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $globalData['returnSuburb'] = trim($this->scopeConfig->getValue('carriers/ausposteParcel/returnAddressSuburb', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $globalData['returnAddressPhone'] = trim($this->scopeConfig->getValue('carriers/ausposteParcel/returnAddressPhone', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $globalData['returnAddressEmail'] = trim($this->scopeConfig->getValue('carriers/ausposteParcel/returnAddressEmail', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+
+        /* label configuration details */
+        $globalData['type'] = 'PRINT';
+        $parcelLayout = $this->scopeConfig->getValue('carriers/ausposteParcel/labelParcelLayout', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $expressLayout = $this->scopeConfig->getValue('carriers/ausposteParcel/labelExpressLayout', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $internationalLayout = $this->scopeConfig->getValue('carriers/ausposteParcel/labelParcelLayoutInternational', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $playout = '';
+        $explayout = '';
+        $intlLayout = '';
+
+        // parcel label layout
+        if ($parcelLayout == 1) {
+            $playout = 'A4-4pp';
+        } elseif ($parcelLayout == 2) {
+            $playout = 'A4-1pp';
+        } elseif ($parcelLayout == 3) {
+            $playout = 'THERMAL-LABEL-A6-1PP';
+        }
+
+        // express label layout
+        if ($expressLayout == 1) {
+            $explayout = 'A4-3pp';
+        } elseif ($expressLayout == 2) {
+            $explayout = 'A4-1pp';
+        } elseif ($expressLayout == 3) {
+            $explayout = 'THERMAL-LABEL-A6-1PP';
+        }
+        
+        // international label layout
+        if ($internationalLayout == 1) {
+            $intlLayout = 'A4-4pp';
+        } elseif ($internationalLayout == 2) {
+            $intlLayout = 'A4-1pp';
+        } elseif ($internationalLayout == 3) {
+            $intlLayout = 'THERMAL-LABEL-A6-1PP';
+        }
+
+        $globalData['label_layout_parcel'] = $playout;
+        $globalData['label_layout_express'] = $explayout;
+        $globalData['auspost_branding'] = $this->scopeConfig->getValue('carriers/ausposteParcel/auspostBranding', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $globalData['left_offset'] = $this->scopeConfig->getValue('carriers/ausposteParcel/leftOffest', \Magento\Store\Model\ScopeInterface::SCOPE_STORE) ? $this->scopeConfig->getValue('carriers/ausposteParcel/leftOffest', \Magento\Store\Model\ScopeInterface::SCOPE_STORE) : 0;
+        $globalData['top_offset'] = $this->scopeConfig->getValue('carriers/ausposteParcel/topOffset', \Magento\Store\Model\ScopeInterface::SCOPE_STORE) ? $this->scopeConfig->getValue('carriers/ausposteParcel/topOffset', \Magento\Store\Model\ScopeInterface::SCOPE_STORE) : 0;
+        $globalData['lable_parcel_layout_international'] = $intlLayout;
+        $globalData['commercialvalue'] = $this->scopeConfig->getValue('carriers/ausposteParcel/commercialvalue', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $globalData['description_of_other'] = $this->scopeConfig->getValue('carriers/ausposteParcel/description_of_other', \Magento\Store\Model\ScopeInterface::SCOPE_STORE) ? $this->scopeConfig->getValue('carriers/ausposteParcel/description_of_other', \Magento\Store\Model\ScopeInterface::SCOPE_STORE) : "";
+        $globalData['article_discription'] = $this->scopeConfig->getValue('carriers/ausposteParcel/description', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $globalData['classification_type'] = $this->scopeConfig->getValue('carriers/ausposteParcel/classificationtype', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $field_string['data'] = json_encode($globalData);
+        $field_string['session_identifier'] = $this->scopeConfig->getValue(self::BIZTECH_ID, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+
+        $finalPostData = http_build_query($field_string);
+
+        $soap_do = curl_init();
+        $url = self::SAASURL . '/api/1.0/customer-details/save-customer-details';
+        curl_setopt($soap_do, CURLOPT_VERBOSE, 1); // set url to post to
+        curl_setopt($soap_do, CURLOPT_URL, $url);
+        curl_setopt($soap_do, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_TIMEOUT, 10);
+        //curl_setopt($soap_do, CURLOPT_SSLVERSION, 3);
+        curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($soap_do, CURLOPT_FOLLOWLOCATION, true); // Add if need to request on https
+        curl_setopt($soap_do, CURLOPT_POST, true);
+        curl_setopt($soap_do, CURLOPT_POSTFIELDS, $finalPostData);
+        $result = curl_exec($soap_do);
+        $response = json_decode($result, true);
+
+
+        if (isset($response['error'])) {
+            $responseArray = ['status' => 'error', 'message' => $response['error']['message']];
+            return $responseArray;
+        }
+        if (!empty($response)) {
+            if (!empty($response)) {
+                $auspostlabel = $this->_objectManager->create('Biztech\Ausposteparcel\Model\Cresource\Auspostlabel\Collection');
+                if (sizeof($auspostlabel) > 0) {
+                    $this->flushAustpostLabel($auspostlabel);
+                }
+                foreach ($response as $key => $value) {
+                    $auspostLabelModel = $this->_objectManager->create('Biztech\Ausposteparcel\Model\Auspostlabel');
+                    if (!isset($value['group'])) {
+                        $labelGroup = 'Express Post';
+                    } else {
+                        $labelGroup = $value['group'];
+                    }
+                    $auspostLabelModel->setLabelGroup($labelGroup)
+                        ->setChargeCode($value['product_id'])
+                        ->setType($value['type'])
+                        ->save();
+                }
+            }
+            $responseArray = ['status' => 'success', 'message' => 'data saved success'];
+            return $responseArray;
+        }
+    }
+
+    public function sendConsignment($consignmentId = null, $orderId = null, $returnLabels = 0)
+    {
+        $address = [];
+        $consignmentData = [];
+        
+        $consignmentData = $this->ausposteParcelInfoHelper->getConsignment($orderId, $consignmentId);
+    
+        $articleData = $this->ausposteParcelInfoHelper->getArticles($orderId, $consignmentId);
+
+        $orderData = $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderId);
+        $shippingAddress = $orderData->getShippingAddress()->getData();
+        $region = $this->_objectManager->create('Magento\Directory\Model\Region')->load($orderData->getShippingAddress()->getRegionid())->getCode();
+        $product_id = explode('-', $orderData->getShippingMethod());
+
+        $auspostLabel = $this->ausposteParcelLabelCollectionFactory->create()->addFieldToFilter('charge_code', $product_id[1])->getData();
+        /* consignment Data */
+
+        $consignmentData['firstname'] = $shippingAddress['firstname'];
+        $consignmentData['middlename'] = $shippingAddress['middlename'];
+        $consignmentData['lastname'] = $shippingAddress['lastname'];
+        $consignmentData['street'] = $shippingAddress['street'];
+        $consignmentData['city'] = $shippingAddress['city'];
+        $consignmentData['region'] = $region;
+        $consignmentData['postcode'] = $shippingAddress['postcode'];
+        $consignmentData['country_id'] = $shippingAddress['country_id'];
+        $consignmentData['telephone'] = $shippingAddress['telephone'];
+        $consignmentData['email'] = $shippingAddress['email'];
+        $consignmentData['shipping_method'] = $orderData->getShippingMethod();
+        $consignmentData['order_id'] = $orderId;
+        $consignmentData['articleData'] = $articleData;
+        $consignmentData['articleData'][0]['item_reference'] = 'eparcelItem_' . $product_id[1];
+        $consignmentData['account_number'] = $this->encryptorInterface->decrypt($this->scopeConfig->getValue('carriers/ausposteParcel/accountNo', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+
+        if ($returnLabels == 1) {
+            $shippingDiscription = $orderData->getShippingDescription();
+            if (stripos($shippingDiscription, 'PARCEL') !== false) {
+                $pid = 'PR';
+                $group = 'Parcel Post';
+            } elseif (stripos($shippingDiscription, 'EXPRESS') !== false) {
+                $pid = 'XPR';
+                $group = 'Express Post';
+            } else {
+                $group = $auspostLabel[0]['label_group'];
+                $pid = $product_id[1];
+                $consignmentData['product_id'] = $pid;
+                $consignmentData['label_group'] = $group;
+            }
+            $consignmentData['product_id'] = $pid;
+            $consignmentData['label_group'] = $group;
+        } else {
+            $group = $auspostLabel[0]['label_group'];
+            $consignmentData['product_id'] = $product_id[1];
+            $consignmentData['label_group'] = $group;
+        }
+        if ($auspostLabel[0]['label_group'] == null) {
+            $consignmentData['label_group'] = 'Parcel Post';
+        }
+        if ($consignmentData['country_id'] !== "AU") {
+             $consignmentData['label_group'] = 'International';
+        }
+        $consignmentData['sender_references'] = (string) __("Order Id: ") . $orderData->getIncrementId();
+        $consignmentData['returnLabels'] = $returnLabels;
+        $field_string['data'] = json_encode($consignmentData);
+
+        
+        /* Session identifier */
+        $field_string['session_identifier'] = $this->scopeConfig->getValue(self::BIZTECH_ID, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $finalPostData = http_build_query($field_string);
+        $soap_do = curl_init();
+        $url = self::SAASURL . '/api/1.0/consignments/save-consignment-data';
+        curl_setopt($soap_do, CURLOPT_VERBOSE, 1); // set url to post to
+        curl_setopt($soap_do, CURLOPT_URL, $url);
+        curl_setopt($soap_do, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_TIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($soap_do, CURLOPT_FOLLOWLOCATION, true); // Add if need to request on https
+        curl_setopt($soap_do, CURLOPT_POST, true);
+        curl_setopt($soap_do, CURLOPT_POSTFIELDS, $finalPostData);
+        $result = curl_exec($soap_do);
+        $errno = '';
+        if (curl_errno($soap_do)) {
+            $error_message = curl_strerror($errno);
+            $error = "cURL error ({$errno}):\n {$error_message}";
+            $responseArray = ['status' => 'error', 'message' => $error];
+            return $responseArray;
+        }
+        return $result;
+    }
+
+    public function orderSummary($orderData)
+    {
+        //$field_string['session_identifier'] = $this->scopeConfig->getValue(self::BIZTECH_ID, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $field_string['session_identifier'] = $this->scopeConfig->getValue('carriers/ausposteParcel/baid', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $field_string['account_number'] = $this->encryptorInterface->decrypt($this->scopeConfig->getValue('carriers/ausposteParcel/accountNo', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $field_string['data'] = json_encode($orderData);
+        $soap_do = curl_init();
+        $finalPostData = http_build_query($field_string);
+        $url = self::SAASURL . '/api/1.0/consignments/save-order-data';
+        curl_setopt($soap_do, CURLOPT_VERBOSE, 1); // set url to post to
+        curl_setopt($soap_do, CURLOPT_URL, $url);
+        curl_setopt($soap_do, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_TIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($soap_do, CURLOPT_FOLLOWLOCATION, true); // Add if need to request on https
+        curl_setopt($soap_do, CURLOPT_POST, true);
+        curl_setopt($soap_do, CURLOPT_POSTFIELDS, $finalPostData);
+        $result = curl_exec($soap_do);
+        $this->jsonHelper = $this->_objectManager->get('Magento\Framework\Json\Helper\Data');
+        $data = $this->jsonHelper->jsonDecode($result, true);
+
+        //        $data = json_decode($result, true);
+        if (isset($data['status'])) {
+            if ($data['status'] == 'error') {
+                $message = $data['message'][0]['message'];
+                //$message = $data->errors[0]->message;
+                $responseArray = ['status' => 'error', 'message' => $data['message']];
+                return $responseArray;
+            }
+        } else {
+            $responseArray = ['status' => 'success', 'url' => $data['order_summary']];
+            return $responseArray;
+        }
+    }
+
+    /*  public function generateLabels()
+      {
+      $soap_do = curl_init();
+      $url = self::SAASURL . '/api/1.0/customer-details/generate-labels';
+      curl_setopt($soap_do, CURLOPT_VERBOSE, 1); // set url to post to
+      curl_setopt($soap_do, CURLOPT_URL, $url);
+      curl_setopt($soap_do, CURLOPT_CONNECTTIMEOUT, 10);
+      curl_setopt($soap_do, CURLOPT_TIMEOUT, 10);
+      curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false);
+      curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false);
+     * curl_setopt($soap_do, CURLOPT_FOLLOWLOCATION, true); // Add if need to request on https
+      curl_setopt($soap_do, CURLOPT_POST, true);
+      curl_setopt($soap_do, CURLOPT_POSTFIELDS, $finalPostData);
+      $result = curl_exec($soap_do);
+      }
+
+      public function downloadLabelReturns($request_id) {
+
+      $account_no = $this->encryptorInterface->decrypt($this->scopeConfig->getValue('carriers/ausposteParcel/accountNo', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+      $username = $this->encryptorInterface->decrypt($this->scopeConfig->getValue(self::XML_PATH_API_KEY, \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+      $password = $this->encryptorInterface->decrypt($this->scopeConfig->getValue(self::XML_PATH_PASSWORD, \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+      $url = 'https://digitalapi.auspost.com.au/shipping/v1/shipments?shipment_ids='.$request_id;
+      $ch = curl_init($url);
+      curl_setopt($ch, CURLOPT_USERPWD, $username . ":" . $password);
+      curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+      curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Account-Number: ' . $account_no));
+      $result = curl_exec($ch);
+      return $result;
+      }
+
+      public function getAddressValidation($requestData)
+      {
+      $field_string['session_identifier'] = $this->scopeConfig->getValue(self::BIZTECH_ID, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+      $field_string['data'] = json_encode($requestData);
+      $soap_do = curl_init();
+      $finalPostData = http_build_query($field_string);
+      $url = self::SAASURL . '/api/1.0/customer-details/address-validation';
+      curl_setopt($soap_do, CURLOPT_VERBOSE, 1); // set url to post to
+      curl_setopt($soap_do, CURLOPT_URL, $url);
+      curl_setopt($soap_do, CURLOPT_CONNECTTIMEOUT, 10);
+      curl_setopt($soap_do, CURLOPT_TIMEOUT, 10);
+      curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false);
+      curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false);
+     * curl_setopt($soap_do, CURLOPT_FOLLOWLOCATION, true); // Add if need to request on https
+      curl_setopt($soap_do, CURLOPT_POST, true);
+      curl_setopt($soap_do, CURLOPT_POSTFIELDS, $finalPostData);
+      $result = curl_exec($soap_do);
+      return $result;
+      }
+
+      public function massLabelGenerate($consignmentids,$request_id,$eparcelConsignmentId)
+      {
+      $account_no = $this->encryptorInterface->decrypt($this->scopeConfig->getValue('carriers/ausposteParcel/accountNo', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+      $requestData['request_id'] =  $request_id;
+      $requestData['eparcel_consignment_id'] =  $eparcelConsignmentId;
+      $requestData['consignment_id']=  $consignmentids;
+      $requestData['account_number'] =  $this->encryptorInterface->decrypt($this->scopeConfig->getValue('carriers/ausposteParcel/accountNo', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+      $field_string['data'] = json_encode($requestData);
+      $field_string['session_identifier'] = $this->scopeConfig->getValue(self::BIZTECH_ID, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+      $finalPostData = http_build_query($field_string);
+      $soap_do = curl_init();
+      $url = self::SAASURL . '/api/1.0/consignments/download-multiple-label';
+      curl_setopt($soap_do, CURLOPT_VERBOSE, 1); // set url to post to
+      curl_setopt($soap_do, CURLOPT_URL, $url);
+      curl_setopt($soap_do, CURLOPT_CONNECTTIMEOUT, 10);
+      curl_setopt($soap_do, CURLOPT_TIMEOUT, 10);
+      curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true);
+      curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false);
+      curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false);
+     * curl_setopt($soap_do, CURLOPT_FOLLOWLOCATION, true); // Add if need to request on https
+      curl_setopt($soap_do, CURLOPT_POST, true);
+      curl_setopt($soap_do, CURLOPT_POSTFIELDS, $finalPostData);
+      $result = curl_exec($soap_do);
+      return $result;
+      }
+     */
+
+    // }
+    public function generateMagentoShipment($order_id)
+    {
+        $order = $this->_objectManager->create('Magento\Sales\Model\Order')->load($order_id);
+        $increamentId = $order->getData('increment_id');
+
+        $qty = [];
+        if ($order->canShip()) {
+            $convertOrder = $this->_objectManager->create('Magento\Sales\Model\Convert\Order');
+            $shipment = $convertOrder->toShipment($order);
+            foreach ($order->getAllItems() as $orderItem) {
+                if (!$orderItem->getQtyToShip() || $orderItem->getIsVirtual()) {
+                    continue;
+                }
+                $qtyShipped = $orderItem->getQtyToShip();
+                $shipmentItem = $convertOrder->itemToShipmentItem($orderItem)->setQty($qtyShipped);
+                $shipment->addItem($shipmentItem);
+            }
+            $shipment->register();
+            $shipment->getOrder()->setIsInProcess(true);
+            try {
+                $shipment->save();
+                $shipment->getOrder()->save();
+
+                $shipment->save();
+            } catch (\Exception $e) {
+                throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
+            }
+            $resultSuccess['status'] = 'success';
+            return $resultSuccess;
+        } else {
+            $resultSuccess['status'] = 'success';
+            $resultSuccess['message'] = (__('Cannot do shipment for order #' . $increamentId));
+            return $resultSuccess;
+        }
+    }
+
+    public function massShipmentGenerate($consignment_ids, $returnLabels = 0)
+    {
+        foreach ($consignment_ids as $key => $value) {
+            $orderId = $value[0];
+            $consignmentId = $value[1];
+            $consignmentData[$key] = $this->ausposteParcelInfoHelper->getConsignment($orderId, $consignmentId);
+            $articleData[$key] = $this->ausposteParcelInfoHelper->getArticles($orderId, $consignmentId);
+
+            $orderData = $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderId);
+            $shippingAddress = $orderData->getShippingAddress()->getData();
+            $region = $this->_objectManager->create('Magento\Directory\Model\Region')->load($orderData->getShippingAddress()->getRegionid())->getCode();
+            $product_id = explode('-', $orderData->getShippingMethod());
+            $auspostLabel = $this->ausposteParcelLabelCollectionFactory->create()->addFieldToFilter('charge_code', $product_id[1])->getData();
+
+            /* consignment Data */
+            $consignmentData[$key]['firstname'] = $shippingAddress['firstname'];
+            $consignmentData[$key]['middlename'] = $shippingAddress['middlename'];
+            $consignmentData[$key]['lastname'] = $shippingAddress['lastname'];
+            $consignmentData[$key]['street'] = $shippingAddress['street'];
+            $consignmentData[$key]['city'] = $shippingAddress['city'];
+            $consignmentData[$key]['region'] = $region;
+            $consignmentData[$key]['postcode'] = $shippingAddress['postcode'];
+            $consignmentData[$key]['country_id'] = $shippingAddress['country_id'];
+            $consignmentData[$key]['telephone'] = $shippingAddress['telephone'];
+            $consignmentData[$key]['email'] = $shippingAddress['email'];
+            $consignmentData[$key]['shipping_method'] = $orderData->getShippingMethod();
+
+            $consignmentData[$key]['order_id'] = $orderId;
+
+            $consignmentData[$key]['articleData'] = $articleData[$key];
+            $consignmentData[$key]['articleData'][0]['item_reference'] = 'eparcelItem_' . $product_id[1];
+
+            if ($returnLabels == 1) {
+                $shippingDiscription = $orderData->getShippingDescription();
+                if (stripos($shippingDiscription, 'PARCEL') !== false) {
+                    $pid = 'PR';
+                    $group = 'Parcel Post';
+                } elseif (stripos($shippingDiscription, 'EXPRESS') !== false) {
+                    $pid = 'XPR';
+                    $group = 'Express Post';
+                }
+                $consignmentData[$key]['product_id'] = $pid;
+                $consignmentData[$key]['label_group'] = $group;
+                $consignmentData[$key]['returnLabels'] = $returnLabels;
+            } else {
+                if ($auspostLabel[0]['label_group'] == null) {
+                    $group = 'Express Post';
+                } else {
+                    $group = $auspostLabel[0]['label_group'];
+                }
+                if ($shippingAddress['country_id'] !== "AU") {
+                    $group = "International";
+                }
+                $consignmentData[$key]['sender_references'] = (string) __("Order Id: ") . $orderData->getIncrementId();
+                $consignmentData[$key]['product_id'] = $product_id[1];
+                $consignmentData[$key]['label_group'] = $group;
+                $consignmentData[$key]['returnLabels'] = $returnLabels;
+            }
+        }
+        $field_string['data'] = json_encode($consignmentData);
+        $field_string['session_identifier'] = $this->scopeConfig->getValue('carriers/ausposteParcel/baid', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $field_string['account_number'] = $this->encryptorInterface->decrypt($this->scopeConfig->getValue('carriers/ausposteParcel/accountNo', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $finalPostData = http_build_query($field_string);
+        $soap_do = curl_init();
+        $url = self::SAASURL . '/api/1.0/consignments/save-multiple-consignment-data';
+        curl_setopt($soap_do, CURLOPT_VERBOSE, 1); // set url to post to
+        curl_setopt($soap_do, CURLOPT_URL, $url);
+        curl_setopt($soap_do, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_TIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($soap_do, CURLOPT_FOLLOWLOCATION, true); // Add if need to request on https
+        curl_setopt($soap_do, CURLOPT_POST, true);
+        curl_setopt($soap_do, CURLOPT_POSTFIELDS, $finalPostData);
+        $result = curl_exec($soap_do);
+        return $result;
+    }
+
+    public function massLabelGenerateAndDownload($finalPostData, $returnLabel = 0)
+    {
+        $finalPostData['account_number'] = $this->encryptorInterface->decrypt($this->scopeConfig->getValue('carriers/ausposteParcel/accountNo', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $finalPostData['returnLabel'] = $returnLabel;
+        $field_string['data'] = json_encode($finalPostData);
+        $field_string['session_identifier'] = $this->scopeConfig->getValue('carriers/ausposteParcel/baid', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        
+        $finalPostData = http_build_query($field_string);
+        $soap_do = curl_init();
+        $url = self::SAASURL . '/api/1.0/consignments/get-multiple-labels-reqeust-to-eParcel';
+        curl_setopt($soap_do, CURLOPT_VERBOSE, 1); // set url to post to
+        curl_setopt($soap_do, CURLOPT_URL, $url);
+        curl_setopt($soap_do, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_TIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($soap_do, CURLOPT_FOLLOWLOCATION, true); // Add if need to request on https
+        curl_setopt($soap_do, CURLOPT_POST, true);
+        curl_setopt($soap_do, CURLOPT_POSTFIELDS, $finalPostData);
+        $result = curl_exec($soap_do);
+        return $result;
+    }
+
+    public function downloadBulkLabels($order_ids)
+    {
+        foreach ($order_ids as $key => $value) {
+            $orderIds[] = $value[0];
+            $consignmentIds[] = $value[1];
+        }
+        $order_ids = implode(",", $orderIds);
+        $field_string['session_identifier'] = $this->scopeConfig->getValue('carriers/ausposteParcel/baid', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $field_string['data'] = json_encode($order_ids);
+        $soap_do = curl_init();
+        $finalPostData = http_build_query($field_string);
+        $url = self::SAASURL . '/api/1.0/consignments/get-bulk-labels';
+        curl_setopt($soap_do, CURLOPT_VERBOSE, 1); // set url to post to
+        curl_setopt($soap_do, CURLOPT_URL, $url);
+        curl_setopt($soap_do, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_TIMEOUT, 10);
+        //curl_setopt($soap_do, CURLOPT_SSLVERSION, 3);
+        curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($soap_do, CURLOPT_FOLLOWLOCATION, true); // Add if need to request on https
+        curl_setopt($soap_do, CURLOPT_POST, true);
+        curl_setopt($soap_do, CURLOPT_POSTFIELDS, $finalPostData);
+        $result = curl_exec($soap_do);
+        $response = json_decode($result, true);
+        return $response;
+    }
+
+    // get shipment rates that includes all surcharges
+    public function getShipmentRates($products, $fromPostcode, $toPostcode, $city, $regioncode, $items)
+    {
+        $sname = trim($this->scopeConfig->getValue('carriers/ausposteParcel/returnAddressName', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $returnAddressLine1 = trim($this->scopeConfig->getValue('carriers/ausposteParcel/returnAddressLine1', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $returnAddressLine2 = trim($this->scopeConfig->getValue('carriers/ausposteParcel/returnAddressLine2', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $returnAddressLine3 = trim($this->scopeConfig->getValue('carriers/ausposteParcel/returnAddressLine3', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $returnAddressLine4 = trim($this->scopeConfig->getValue('carriers/ausposteParcel/returnAddressLine4', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        
+        $coutnry = 'AU';
+        $returnAddressPostcode = trim($this->scopeConfig->getValue('carriers/ausposteParcel/returnAddressPostcode', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $returnAddressStateCode = trim($this->scopeConfig->getValue('carriers/ausposteParcel/returnAddressStateCode', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $returnAddressSuburb = trim($this->scopeConfig->getValue('carriers/ausposteParcel/returnAddressSuburb', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+
+        $auspostlabel = $this->_objectManager->create('Biztech\Ausposteparcel\Model\Cresource\Auspostlabel\Collection');
+            
+
+        $numProducts = count($products);
+        $counter = 0;
+
+        $requestData = [];
+        $requestData['shipments'] = [];
+        $index = 0;
+
+        $domesticcover = ($this->scopeConfig->getValue('carriers/ausposteParcel/insurance', \Magento\Store\Model\ScopeInterface::SCOPE_STORE) == 1) ? true : false;
+
+        if ($domesticcover) {
+            $defaultInsuranceValue = $this->scopeConfig->getValue('carriers/ausposteParcel/defaultInsuranceValue', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        }
+        $authority_to_leave = ($this->scopeConfig->getValue('carriers/ausposteParcel/signatureRequired', \Magento\Store\Model\ScopeInterface::SCOPE_STORE) == 1) ? 'false' : 'true';
+        $partialDeliveryAllowed = ($this->scopeConfig->getValue('carriers/ausposteParcel/partialDeliveryAllowed', \Magento\Store\Model\ScopeInterface::SCOPE_STORE) == 1) ? 'true' : 'false';
+        
+        foreach ($auspostlabel->getData() as $method) {
+            if (strpos($method['type'], "INT'L") !== false || strpos($method['type'], "INTL") !== false || strpos($method['type'], "APGL") !== false) {
+                continue;
+            }
+            $requestData['shipments'][$index]['email_tracking_enabled'] = true;
+
+            // Sender Address
+            $requestData['shipments'][$index]['from']['name'] = $sname;
+            $requestData['shipments'][$index]['from']['lines'][] = $returnAddressLine1;
+            $requestData['shipments'][$index]['from']['lines'][] = $returnAddressLine2;
+            $requestData['shipments'][$index]['from']['lines'][] = $returnAddressLine3;
+            $requestData['shipments'][$index]['from']['suburb'] = $returnAddressSuburb;
+            $requestData['shipments'][$index]['from']['state'] = $returnAddressStateCode;
+            $requestData['shipments'][$index]['from']['postcode'] = $returnAddressPostcode;
+
+            // Receiver Address
+            $requestData['shipments'][$index]['to']['suburb'] = $city;
+            $requestData['shipments'][$index]['to']['state'] = $regioncode;
+            $requestData['shipments'][$index]['to']['postcode'] = $toPostcode;
+            $requestData['shipments'][$index]['to']['phone'] = "0412345678";
+            $requestData['shipments'][$index]['to']['email'] = "jane.smith@smith.com";
+
+            
+            if ($domesticcover) {
+                $requestData['shipments'][$index]['items'][] = ['product_id' => $method['charge_code'],'length' => $items['length'], 'height' => $items['height'], 'width' => $items['width'], 'weight' => $items['weight'],'authority_to_leave' => $authority_to_leave,'allow_partial_delivery' => $partialDeliveryAllowed , "features" => ["TRANSIT_COVER" => ["attributes"=> ["cover_amount" => $defaultInsuranceValue]]]];
+            } else {
+                $requestData['shipments'][$index]['items']= ['product_id' => $method['charge_code'], 'length' => $items['length'], 'height' => $items['height'], 'width' => $items['width'], 'weight' => $items['weight'], 'authority_to_leave' => $authority_to_leave, 'allow_partial_delivery' => $partialDeliveryAllowed];
+            }
+            $index++;
+        }
+
+        $field_string['session_identifier'] = $this->scopeConfig->getValue('carriers/ausposteParcel/baid', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $field_string['account_number'] = $this->encryptorInterface->decrypt($this->scopeConfig->getValue('carriers/ausposteParcel/accountNo', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $field_string['data'] = json_encode($requestData);
+        
+        $finalPostData = http_build_query($field_string);
+        $soap_do = curl_init();
+        $url = self::SAASURL . '/api/1.0/customer-details/get-shipment-price';
+        curl_setopt($soap_do, CURLOPT_VERBOSE, 1); // set url to post to
+        curl_setopt($soap_do, CURLOPT_URL, $url);
+        curl_setopt($soap_do, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_TIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($soap_do, CURLOPT_POST, true);
+        curl_setopt($soap_do, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($soap_do, CURLOPT_POSTFIELDS, $finalPostData);
+        $result = curl_exec($soap_do);
+        return $result;
+    }
+
+    //get contract rates
+    public function getContractRates($requestData)
+    {
+        $field_string['session_identifier'] = $this->scopeConfig->getValue('carriers/ausposteParcel/baid', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $field_string['account_number'] = $this->encryptorInterface->decrypt($this->scopeConfig->getValue('carriers/ausposteParcel/accountNo', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $field_string['data'] = json_encode($requestData);
+        $soap_do = curl_init();
+        $finalPostData = http_build_query($field_string);
+        $url = self::SAASURL . '/api/1.0/customer-details/shipping-rates';
+        curl_setopt($soap_do, CURLOPT_VERBOSE, 1); // set url to post to
+        curl_setopt($soap_do, CURLOPT_URL, $url);
+        curl_setopt($soap_do, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_TIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($soap_do, CURLOPT_FOLLOWLOCATION, true); // Add if need to request on https
+        curl_setopt($soap_do, CURLOPT_POST, true);
+        curl_setopt($soap_do, CURLOPT_POSTFIELDS, $finalPostData);
+        $result = curl_exec($soap_do);
+        return $result;
+    }
+
+    public function downloadLabel($consignment_number, $eparcel_consignment_id, $label_request_id, $returnLabel = 0)
+    {
+        $requestData = [];
+        $requestData['request_id'] = $label_request_id;
+        $requestData['return_label'] = $returnLabel;
+        $requestData['eparcel_consignment_id'] = $eparcel_consignment_id;
+        $requestData['consignment_id'] = $consignment_number;
+        $requestData['account_number'] = $this->encryptorInterface->decrypt($this->scopeConfig->getValue('carriers/ausposteParcel/accountNo', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $field_string['data'] = json_encode($requestData);
+        $field_string['session_identifier'] = $this->scopeConfig->getValue('carriers/ausposteParcel/baid', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $finalPostData = http_build_query($field_string);
+        $soap_do = curl_init();
+        $url = self::SAASURL . '/api/1.0/consignments/download-label';
+        curl_setopt($soap_do, CURLOPT_VERBOSE, 1); // set url to post to
+        curl_setopt($soap_do, CURLOPT_URL, $url);
+        curl_setopt($soap_do, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_TIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($soap_do, CURLOPT_FOLLOWLOCATION, true); // Add if need to request on https
+        curl_setopt($soap_do, CURLOPT_POST, true);
+        curl_setopt($soap_do, CURLOPT_POSTFIELDS, $finalPostData);
+        $result = curl_exec($soap_do);
+        return $result;
+    }
+
+    public function sendUpdatedConsignment($consignmentId = null, $orderId = null, $returnLabels = 0)
+    {
+        $address = [];
+        $consignmentData = $this->ausposteParcelInfoHelper->getConsignment($orderId, $consignmentId);
+        $articleData = $this->ausposteParcelInfoHelper->getArticles($orderId, $consignmentId);
+        $orderData = $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderId);
+        $shippingAddress = $orderData->getShippingAddress()->getData();
+
+        $region = $this->_objectManager->create('Magento\Directory\Model\Region')->load($orderData->getShippingAddress()->getRegionid())->getCode();
+        $product_id = explode('-', $orderData->getShippingMethod());
+        $auspostLabel = $this->ausposteParcelLabelCollectionFactory->create()->addFieldToFilter('charge_code', $product_id[1])->getData();
+
+        /* consignment Data */
+        if ($orderData->getEparcelShippingId() !== null) {
+            $consignmentData['shipment_id'] = $orderData->getEparcelShippingId();
+        }
+        $consignmentData['firstname'] = $shippingAddress['firstname'];
+        $consignmentData['middlename'] = $shippingAddress['middlename'];
+        $consignmentData['lastname'] = $shippingAddress['lastname'];
+        $consignmentData['street'] = $shippingAddress['street'];
+        $consignmentData['city'] = $shippingAddress['city'];
+        $consignmentData['region'] = $region;
+        $consignmentData['postcode'] = $shippingAddress['postcode'];
+        $consignmentData['country_id'] = $shippingAddress['country_id'];
+        $consignmentData['telephone'] = $shippingAddress['telephone'];
+        $consignmentData['email'] = $shippingAddress['email'];
+        $consignmentData['shipping_method'] = $orderData->getShippingMethod();
+
+        $consignmentData['order_id'] = $orderId;
+
+        $consignmentData['articleData'] = $articleData;
+        $consignmentData['articleData'][0]['item_reference'] = 'eparcelItem_' . $product_id[1];
+        $consignmentData['account_number'] = $this->encryptorInterface->decrypt($this->scopeConfig->getValue('carriers/ausposteParcel/accountNo', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+
+        if ($returnLabels == 1) {
+            $shippingDiscription = $orderData->getShippingDescription();
+            if (stripos($shippingDiscription, 'PARCEL') !== false) {
+                $pid = 'PR';
+                $group = 'Parcel Post';
+            } elseif (stripos($shippingDiscription, 'EXPRESS') !== false) {
+                $pid = 'XPR';
+                $group = 'Express Post';
+            }
+            $consignmentData['product_id'] = $pid;
+            $consignmentData['label_group'] = $group;
+        } else {
+            $group = $auspostLabel[0]['label_group'];
+            $consignmentData['product_id'] = $product_id[1];
+            $consignmentData['label_group'] = $group;
+        }
+        /* For international Shipping Not gettinh Label Group : compalsry pass "Parcel Post" */
+        if ($auspostLabel[0]['label_group'] == null) {
+            $consignmentData['label_group'] = 'Parcel Post';
+        }
+        $consignmentData['returnLabels'] = $returnLabels;
+        $field_string['data'] = json_encode($consignmentData);
+        /* Session identifier */
+        $field_string['session_identifier'] = $this->scopeConfig->getValue(self::BIZTECH_ID, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $finalPostData = http_build_query($field_string);
+        $soap_do = curl_init();
+        $url = self::SAASURL . '/api/1.0/consignments/update-consignment-data';
+        curl_setopt($soap_do, CURLOPT_VERBOSE, 1); // set url to post to
+        curl_setopt($soap_do, CURLOPT_URL, $url);
+        curl_setopt($soap_do, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_TIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($soap_do, CURLOPT_FOLLOWLOCATION, true); // Add if need to request on https
+        curl_setopt($soap_do, CURLOPT_POST, true);
+        curl_setopt($soap_do, CURLOPT_POSTFIELDS, $finalPostData);
+        $result = curl_exec($soap_do);
+        return $result;
+    }
+
+    public function getUpdatedLabel($consignmentId = null, $orderId = null, $returnLabels = 0)
+    {
+        $orderData = $this->_objectManager->create('Magento\Sales\Model\Order')->load($orderId);
+        $product_id = explode('-', $orderData->getShippingMethod());
+        $shippingAddress = $orderData->getShippingAddress()->getData();
+        $consignmentData['country_id'] = $shippingAddress['country_id'];
+        $consignmentData['shipping_method'] = $orderData->getShippingMethod();
+        $consignmentData['account_number'] = $this->encryptorInterface->decrypt($this->scopeConfig->getValue('carriers/ausposteParcel/accountNo', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+
+        /* consignment Data */
+        if ($orderData->getEparcelShippingId() !== null) {
+            $consignmentData['shipment_id'] = $orderData->getEparcelShippingId();
+        }
+
+        $auspostLabel = $this->ausposteParcelLabelCollectionFactory->create()->addFieldToFilter('charge_code', $product_id[1])->getData();
+
+        if ($returnLabels == 1) {
+            $shippingDiscription = $orderData->getShippingDescription();
+            if (stripos($shippingDiscription, 'PARCEL') !== false) {
+                $pid = 'PR';
+                $group = 'Parcel Post';
+            } elseif (stripos($shippingDiscription, 'EXPRESS') !== false) {
+                $pid = 'XPR';
+                $group = 'Express Post';
+            }
+            $consignmentData['product_id'] = $pid;
+            $consignmentData['label_group'] = $group;
+        } else {
+            $group = $auspostLabel[0]['label_group'];
+            $consignmentData['product_id'] = $product_id[1];
+            $consignmentData['label_group'] = $group;
+        }
+        /* For international Shipping Not gettinh Label Group : compalsry pass "Parcel Post" */
+        if ($auspostLabel[0]['label_group'] == null) {
+            $consignmentData['label_group'] = 'Parcel Post';
+        }
+        $consignmentData['returnLabels'] = $returnLabels;
+        $field_string['data'] = json_encode($consignmentData);
+        /* Session identifier */
+        $field_string['session_identifier'] = $this->scopeConfig->getValue(self::BIZTECH_ID, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $finalPostData = http_build_query($field_string);
+        $soap_do = curl_init();
+        $url = self::SAASURL . '/api/1.0/consignments/get-updated-label';
+        curl_setopt($soap_do, CURLOPT_VERBOSE, 1); // set url to post to
+        curl_setopt($soap_do, CURLOPT_URL, $url);
+        curl_setopt($soap_do, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_TIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($soap_do, CURLOPT_FOLLOWLOCATION, true); // Add if need to request on https
+        curl_setopt($soap_do, CURLOPT_POST, true);
+        curl_setopt($soap_do, CURLOPT_POSTFIELDS, $finalPostData);
+        $result = curl_exec($soap_do);
+        return $result;
+    }
+
+    public function getConsignmentDetails($shipmentId)
+    {
+        $shipmentData['shipment_id'] = $shipmentId;
+        $shipmentData['account_number'] = $this->encryptorInterface->decrypt($this->scopeConfig->getValue('carriers/ausposteParcel/accountNo', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $field_string['data'] = json_encode($shipmentData);
+        /* Session identifier */
+        $field_string['session_identifier'] = $this->scopeConfig->getValue(self::BIZTECH_ID, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $finalPostData = http_build_query($field_string);
+        $soap_do = curl_init();
+        $url = self::SAASURL . '/api/1.0/consignments/get-consignment-details';
+        curl_setopt($soap_do, CURLOPT_VERBOSE, 1); // set url to post to
+        curl_setopt($soap_do, CURLOPT_URL, $url);
+        curl_setopt($soap_do, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_TIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($soap_do, CURLOPT_FOLLOWLOCATION, true); // Add if need to request on https
+        curl_setopt($soap_do, CURLOPT_POST, true);
+        curl_setopt($soap_do, CURLOPT_POSTFIELDS, $finalPostData);
+        $result = curl_exec($soap_do);
+        return $result;
+    }
+
+    public function downloadUpdatedLabel($consignment_number, $eparcel_consignment_id, $label_request_id)
+    {
+        $requestData = [];
+        $requestData['request_id'] = $label_request_id;
+        $requestData['eparcel_consignment_id'] = $eparcel_consignment_id;
+        $requestData['consignment_id'] = $consignment_number;
+        $requestData['account_number'] = $this->encryptorInterface->decrypt($this->scopeConfig->getValue('carriers/ausposteParcel/accountNo', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $field_string['data'] = json_encode($requestData);
+        $field_string['session_identifier'] = $this->scopeConfig->getValue(self::BIZTECH_ID, \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $finalPostData = http_build_query($field_string);
+        $soap_do = curl_init();
+        $url = self::SAASURL . '/api/1.0/consignments/download-updated-label';
+        curl_setopt($soap_do, CURLOPT_VERBOSE, 1); // set url to post to
+        curl_setopt($soap_do, CURLOPT_URL, $url);
+        curl_setopt($soap_do, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($soap_do, CURLOPT_TIMEOUT, 10);
+        //curl_setopt($soap_do, CURLOPT_SSLVERSION, 3);
+        curl_setopt($soap_do, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($soap_do, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($soap_do, CURLOPT_FOLLOWLOCATION, true); // Add if need to request on https
+        curl_setopt($soap_do, CURLOPT_POST, true);
+        curl_setopt($soap_do, CURLOPT_POSTFIELDS, $finalPostData);
+        $result = curl_exec($soap_do);
+        return $result;
+    }
+}

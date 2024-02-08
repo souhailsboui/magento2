@@ -1,0 +1,161 @@
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="auspost_label">
+        <column xsi:type="int" name="label_id" comment="Shipping Method" unsigned="true" identity="true" nullable="false" />
+        <column xsi:type="text" name="label_group" comment="LabelGroup" nullable="true"/>
+        <column xsi:type="text" name="charge_code" comment="ChargeCode" nullable="true" />
+        <column xsi:type="text" name="type" comment="type" nullable="true" />
+         <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="label_id"/>
+        </constraint>
+    </table>
+    <table name="biztech_ausposteParcel_free_shipping">
+        <column xsi:type="int" name="id" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="text" name="charge_code" comment="charge code" nullable="false"/>
+        <column xsi:type="decimal" name="minimum_amount" comment="minimum amount" nullable="false" />
+        <column xsi:type="int" name="status" comment="status" nullable="false" default="1" />
+        <column xsi:type="decimal" name="from_amount" comment="from amount" nullable="false" default="0" />
+        <column xsi:type="decimal" name="to_amount" comment="to amount" nullable="true" default="0" />
+         <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+    </table>
+    <table name="biztech_ausposteParcel_tablerate">
+        <column xsi:type="int" name="pk" unsigned="true" nullable="false" identity="true" />
+        <column xsi:type="int" name="website_id" nullable="false" default="0"/>
+        <column xsi:type="int" name="dest_country_id" nullable="true" default="0"/>
+        <column xsi:type="varchar" name="dest_region_id" length="10" nullable="true" />
+        <column xsi:type="varchar" name="dest_zip" nullable="false" length="20" />
+        <column xsi:type="varchar" name="condition_name" nullable="false" length="20" />
+        <column xsi:type="decimal" name="condition_from_value" nullable="false" default='0.0000' />
+        <column xsi:type="decimal" name="condition_to_value" nullable="true" default='0.0000' />
+        <column xsi:type="decimal" name="price" nullable="false" default='0.0000' />
+        <column xsi:type="decimal" name="price_per_kg" nullable="true" default='0.0000' />
+        <column xsi:type="decimal" name="cost" nullable="true" default='0.0000' />
+        <column xsi:type="varchar" name="delivery_type" nullable="false" length="20" />
+        <column xsi:type="varchar" name="charge_code" nullable="false" length="20" />
+         <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="pk"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="UNIQUE">
+            <column name="website_id"/>
+            <column name="dest_country_id"/>
+            <column name="dest_region_id"/>
+            <column name="dest_zip"/>
+            <column name="condition_name"/>
+            <column name="condition_to_value"/>
+            <column name="delivery_type"/>
+        </constraint>
+    </table>
+    <table name="biztech_ausposteParcel_nonausposteParcel">
+        <column xsi:type="int" name="id" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="text" name="method" comment="method" nullable="false" />
+        <column xsi:type="text" name="charge_code" comment="charge code" nullable="false"/>
+         <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+    </table>
+    <table name="biztech_ausposteParcel_article">
+        <column xsi:type="int" name="article_id" unsigned="true" nullable="false" identity="true" />
+        <column xsi:type="int" name="order_id" nullable="false" default="0"/>
+        <column xsi:type="varchar" name="consignment_number" nullable="false"/>
+        <column xsi:type="text" name="article_number" nullable="false" />
+        <column xsi:type="text" name="actual_weight" nullable="false"/>
+        <column xsi:type="text" name="article_description" nullable="false" />
+        <column xsi:type="text" name="cubic_weight" nullable="false" />
+        <column xsi:type="text" name="height" nullable="false" />
+        <column xsi:type="text" name="width" nullable="false" />
+        <column xsi:type="text" name="length" nullable="false" />
+        <column xsi:type="text" name="is_transit_cover_required" nullable="false" />
+        <column xsi:type="text" name="transit_cover_amount" nullable="false" />
+        <column xsi:type="text" name="eparcel_article_id" nullable="false" />
+        <column xsi:type="text" name="unit_value" nullable="false" />
+         <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="article_id"/>
+        </constraint>
+        <index referenceId="art_consignment_number" indexType="btree">
+         		<column name="consignment_number"/>
+     	</index>
+    </table>
+    <table name="biztech_ausposteParcel_article_type">
+        <column xsi:type="int" name="id" unsigned="true" nullable="false" identity="true" />
+        <column xsi:type="varchar" name="name" length="10" nullable="false"/>
+        <column xsi:type="varchar" name="weight" length="10" nullable="false"/>
+        <column xsi:type="varchar" name="width" length="10" nullable="false" />
+        <column xsi:type="varchar" name="height" length="10" nullable="false"/>
+        <column xsi:type="varchar" name="length" length="10" nullable="false" />
+        <column xsi:type="int" name="status" nullable="false" default="1"/>
+         <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+    </table>
+    <table name="biztech_ausposteParcel_chargecode">
+        <column xsi:type="text" name="charge_code" nullable="false"/>
+    </table>
+    <table name="biztech_ausposteParcel_manifest">
+        <column xsi:type="int" name="manifest_id" unsigned="true" nullable="false" identity="true" />
+        <column xsi:type="varchar" name="manifest_number" nullable="false"/>
+        <column xsi:type="text" name="despatch_date" nullable="false"/>
+        <column xsi:type="text" name="label" nullable="false" />
+        <column xsi:type="int" name="number_of_articles" nullable="false"/>
+        <column xsi:type="int" name="number_of_consignments" nullable="false" />
+         <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="manifest_id"/>
+        </constraint>
+        <index referenceId="man_manifest_number" indexType="btree">
+         		<column name="manifest_number"/>
+     	</index>
+    </table>
+    <table name="biztech_ausposteParcel_consignment">
+        <column xsi:type="int" name="consignment_id" unsigned="true" nullable="false" identity="true"/>
+        <column xsi:type="int" name="order_id" nullable="false"/>
+        <column xsi:type="varchar" name="consignment_number" nullable="false"/>
+        <column xsi:type="text" name="add_date" nullable="false" />
+        <column xsi:type="text" name="modify_date" nullable="false"/>
+        <column xsi:type="text" name="delivery_signature_allowed" nullable="true" />
+        <column xsi:type="text" name="print_return_labels" nullable="false"/>
+        <column xsi:type="text" name="contains_dangerous_goods" nullable="false" />
+        <column xsi:type="text" name="partial_delivery_allowed" nullable="false"/>
+        <column xsi:type="text" name="cash_to_collect" nullable="false" />
+        <column xsi:type="text" name="weight" nullable="true" />
+        <column xsi:type="boolean" name="is_return_label_printed" nullable="true"/>
+        <column xsi:type="boolean" name="email_notification" nullable="true" />
+        <column xsi:type="boolean" name="is_label_printed" nullable="false"/>
+        <column xsi:type="boolean" name="is_label_created" nullable="false" />
+        <column xsi:type="boolean" name="is_next_manifest" nullable="false"/>
+        <column xsi:type="boolean" name="notify_customers" nullable="true" />
+        <column xsi:type="varchar" name="manifest_number" nullable="true"/>
+        <column xsi:type="boolean" name="despatched" nullable="false" />
+        <column xsi:type="text" name="label" nullable="true"/>
+        <column xsi:type="text" name="general_ausposteParcel_shipping_chargecode" nullable="true"/>
+        <column xsi:type="int" name="is_submitted_to_eparcel" nullable="true" />
+        <column xsi:type="text" name="delivery_instructions" nullable="true"/>
+        <column xsi:type="text" name="label_request_id" nullable="true" />
+        <column xsi:type="text" name="eparcel_consignment_id" nullable="true"/>
+        <column xsi:type="text" name="label_url" nullable="true"/>
+        <column xsi:type="text" name="label_creation_date" nullable="true"/>
+        <column xsi:type="text" name="return_lable_url" nullable="true"/>
+        <column xsi:type="text" name="return_label_creation_date" nullable="true"/>
+         <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="consignment_id"/>
+        </constraint>
+        <index referenceId="con_order_id_despatched" indexType="btree">
+         		<column name="order_id"/>
+                <column name="despatched"/>
+     	</index>
+        <index referenceId="con_consignment_number" indexType="btree">
+         		<column name="consignment_number"/>
+     	</index>
+        <index referenceId="con_manifest_number" indexType="btree">
+         		<column name="manifest_number"/>
+     	</index>
+    </table>
+    <table name="sales_order">
+        <column xsi:type="int" name="is_address_valid" nullable="true" default="0" comment="Is Address Valid" />
+        <column xsi:type="int" name="is_label_generated" nullable="true" />
+        <column xsi:type="int" name="is_label_printed" nullable="true" comment="is_label_printed" />
+        <column xsi:type="text" name="eparcel_shipping_id" nullable="true"  />
+        <column xsi:type="int" name="is_submitted_to_eparcel" nullable="true" />
+        <column xsi:type="text" name="eparcel_returnlabel_shipping_id" nullable="true"/>
+    </table>
+</schema>

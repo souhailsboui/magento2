@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Checkout\Block\Onepage">
+        <arguments>
+            <argument name="layoutProcessors" xsi:type="array">
+                <item name="append_address_lookup_result" xsi:type="object">Machship\Fusedship\Block\Checkout\LayoutProcessor</item>
+            </argument>
+        </arguments>
+    </type>
+    <preference for="Magento\Checkout\Block\Cart\LayoutProcessor"
+                    type="Machship\Fusedship\Model\Checkout\Block\Cart\Shipping" />
+</config>

@@ -1,0 +1,467 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../Magento/Config/etc/system_file.xsd">
+    <system>
+        <tab id="biztech" translate="label" sortOrder="210">
+            <label>AppJetty Extensions</label>
+        </tab>
+        <section id="ausposteParcel"  showInDefault="1" showInWebsite="1" showInStore="1">
+            <tab>biztech</tab>
+            <label>Australia Post Parcel Send</label>
+            <resource>Biztech_Ausposteparcel::biztech_ausposteparcel</resource>
+            <group id="activation"  showInDefault="1">
+                <label>Australia Post Parcel Send Activation</label>
+                <field id="key" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Activation Key</label>
+                    <validate>required-entry</validate>
+                    <comment model="Biztech\Ausposteparcel\Model\System\Config\Comment"></comment>
+                </field>
+                <field id="store" translate="label" type="multiselect" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Select Store</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\WebsiteStoreview</source_model>
+                </field>
+            </group>
+        </section>
+        <section id="carriers" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+            <group id="ausposteParcel" translate="label"  type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>AppJetty Australia Post Parcel Send</label>
+                <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Enabledisable</source_model>
+                    <frontend_model>Biztech\Ausposteparcel\Block\Adminhtml\Enabledisable</frontend_model>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Title</label>
+                    <comment>Enter the text to be displayed on the Checkout Page where shipping options are displayed.</comment>
+                </field>
+                <field id="sallowspecific" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Ship to Applicable Countries</label>
+                    <frontend_class>shipping-applicable-country</frontend_class>
+                    <source_model>Magento\Shipping\Model\Config\Source\Allspecificcountries</source_model>
+                </field>
+                <field id="specificcountry" translate="label" type="multiselect" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Ship to Specific Countries</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+                <field id="sort_order" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Sort Order</label>
+                </field>
+
+                <field id="contractproducttype" translate="label" type="editablemultiselect" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Configure to display shipping method</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Contractproducttype</source_model>
+                    <tooltip><![CDATA[If you are not able to see any shipping method try to save the configuration and provide the proper credentials with the preferable operation mode.]]></tooltip>
+                    <comment>You account based shipping method select a particular shipping method that you wanted to enable.</comment>
+                </field>
+
+                <field id="enablefreeshipping" translate="label" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enable Free Shipping</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="freeshippingproducttype" translate="label" type="multiselect" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Select the free shipping method</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Contractproducttype</source_model>
+                    <tooltip><![CDATA[If you are not able to see any shipping method try to save the configuration and provide the proper credentials with the preferable operation mode.]]></tooltip>
+                    <depends>
+                        <field id="enablefreeshipping">1</field>
+                    </depends>
+                    <comment>You account based shipping method select a particular shipping method that will consider as a free shipping.</comment>
+                </field>
+
+                <field id="freeshippingsubtotal" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Define Minimum Subtotal for Order to be applicable for free shipping</label>
+                    <validate>validate-number validate-zero-or-greater required</validate>
+                    <depends>
+                        <field id="enablefreeshipping">1</field>
+                    </depends>
+                </field>
+
+                <field id="hiderates" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Hide Australia Post Shipping Method From Customer</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                
+                <!-- <field id="usecustomshipppingname" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Use Custom Shipping MethodName</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="shippingmethodname" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Define the Shipping method Name</label>
+                    <depends>
+                        <field id="usecustomshipppingname">1</field>
+                    </depends>
+                </field> -->
+
+                <field id="showmethod" translate="label" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Show Method if Not Applicable</label>
+                    <frontend_class>shipping-skip-hide</frontend_class>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="specificerrmsg" translate="label" type="textarea" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Displayed Error Message</label>
+                </field>
+                <field id="heading_shippingmethod_configurations" translate="label" type="label"  sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Shipping And Tracking API Key</label>
+                    <frontend_model>Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+                </field>
+                <field id="accountNo" translate="label" type="obscure" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Account No</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+
+                <field id="apiKey" translate="label" type="obscure" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Key ( username )</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+
+                <field id="password" translate="label" type="obscure" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Password ( secret ) </label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+                <field id="operationMode" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Operation Mode</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Livetest</source_model>
+                </field>
+                <field id="address_configuration" translate="label" type="label"  sortOrder="14" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Return Address Configuration</label>
+                    <frontend_model>Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+                </field>
+                <field id="returnAddressName" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Name</label>
+                    <validate>validate-length maximum-length-40</validate>
+                </field>
+                <field id="returnAddressLine1" translate="label" type="text" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Address Line 1</label>
+                    <validate>required-entry validate-length maximum-length-40</validate>
+                </field>
+                <field id="returnAddressLine2" translate="label" type="text" sortOrder="17" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Address Line 2</label>
+                    <validate>validate-length maximum-length-40</validate>
+                </field>
+                <field id="returnAddressLine3" translate="label" type="text" sortOrder="18" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Address Line 3</label>
+                    <validate>validate-length maximum-length-40</validate>
+                </field>
+                <field id="returnAddressLine4" translate="label" type="text" sortOrder="19" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Address Line 4</label>
+                    <validate>validate-length maximum-length-40</validate>
+                </field>
+                <field id="returnAddressSuburb" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>City ( Suburb )</label>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="returnAddressStateCode" translate="label" type="select" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>State Code</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\States</source_model>
+                    <validate>required-entry</validate>
+                </field>
+                <field id="returnAddressPostcode" translate="label" type="text" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Postcode</label>
+                    <comment>Enter 4 digit post code</comment>
+                    <validate>required-entry validate-digits validate-length maximum-length-4 minimum-length-4</validate>
+                </field>
+                <field id="returnAddressPhone" translate="label" type="text" sortOrder="23" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Phone Number</label>
+                    <validate>validate-digits validate-length maximum-length-10</validate>
+                </field>
+                <field id="returnAddressEmail" translate="label" type="text" sortOrder="24" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Email Id</label>
+                    <validate>validate-email</validate>
+                </field>
+                <field id="product_configuration" translate="label" type="label"  sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Product Configuration</label>
+                    <frontend_model>Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+                </field>
+                <field id="length_attribute" translate="label" type="select" sortOrder="26" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Select Attribute for Length</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Attributes</source_model>
+                    <comment>Select length attribute</comment>
+                </field>
+                <field id="height_attribute" translate="label" type="select" sortOrder="27" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Select Attribute for Height/Thickness</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Attributes</source_model>
+                    <comment>Select height / thickness attribute.</comment>
+                </field>
+                <field id="width_attribute" translate="label" type="select" sortOrder="28" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Select Attribute for Width</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Attributes</source_model>
+                    <comment>Select width attribute.</comment>
+                </field>
+                <field id="weight_unit" translate="label" type="select" sortOrder="29" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Default Weight Unit</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Unit</source_model>
+                    <comment>Product weight unit</comment>
+                </field>
+
+                <field id="default_weight" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Define Default Weight</label>
+                    <validate>validate-number required validate-digits-range digits-range-01-22</validate>
+                    <comment>If product weight are empty or not define, this field value will be used.</comment>
+                </field>                
+
+                <field id="auspost_allow_default" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Allow Default Value for Dimension</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>If product dimensions are empty , global values mentioned below will be used.</comment>
+                </field>
+
+                <field id="length_value" translate="label" type="text" sortOrder="31" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Default Length (cm)</label>
+                    <depends>
+                        <field id="auspost_allow_default">1</field>
+                    </depends>
+                    <validate>validate-number required validate-digits-range digits-range-01-105</validate>
+                </field>
+
+                <field id="height_value" translate="label" type="text" sortOrder="32" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Default Height (cm)</label>
+                    <depends>
+                        <field id="auspost_allow_default">1</field>
+                    </depends>
+                    <validate>validate-number required validate-digits-range digits-range-01-105</validate>
+                </field>
+
+                <field id="width_value" translate="label" type="text" sortOrder="33" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Default Width (cm)</label>
+                    <depends>
+                        <field id="auspost_allow_default">1</field>
+                    </depends>
+                    <validate>validate-number required validate-digits-range digits-range-01-105</validate>
+                </field>
+                <field id="article_configuration" translate="label" type="label"  sortOrder="34" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Article Configuration</label>
+                    <frontend_model>Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+                </field>
+                <field id="signatureRequired" translate="label" type="select" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Signature Required</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Enabledisable</source_model>
+                    <frontend_model>Biztech\Ausposteparcel\Block\Adminhtml\Enabledisable</frontend_model>
+                </field>
+                <field id="safeDropEnabled" translate="label" type="select" sortOrder="35" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Safe Drop Enabled</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Enabledisable</source_model>
+                    <frontend_model>Biztech\Ausposteparcel\Block\Adminhtml\Enabledisable</frontend_model>
+                </field>
+                <field id="printReturnLabels" translate="label" type="select" sortOrder="36" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Print Return Labels</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Enabledisable</source_model>
+                    <frontend_model>Biztech\Ausposteparcel\Block\Adminhtml\Enabledisable</frontend_model>
+                </field>
+                <field id="partialDeliveryAllowed" translate="label" type="select" sortOrder="37" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Partial Delivery Allowed</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Enabledisable</source_model>
+                    <frontend_model>Biztech\Ausposteparcel\Block\Adminhtml\Enabledisable</frontend_model>
+                    <tooltip>Default setting for specifying if partial delivery is allowed for consignments. This default can be overridden when creating consignments.</tooltip>
+                </field>
+
+                <field id="insurance" translate="label" type="select" sortOrder="37" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Transit Cover Amount</label>
+                    <validate>required-entry</validate>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Enabledisable</source_model>
+                    <frontend_model>Biztech\Ausposteparcel\Block\Adminhtml\Enabledisable</frontend_model>
+                </field>
+
+                <field id="defaultInsuranceValue" translate="label" type="text" sortOrder="37" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <depends><field id="carriers/ausposteParcel/insurance">1</field></depends>
+                    <label>Transit Cover Amount</label>
+                    <validate>validate-number required-entry validate-zero-or-greater</validate>
+                </field>
+
+                <field id="useTotalOrderWeight" translate="label" type="select" sortOrder="37" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Use Order Total Weight</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Enabledisable</source_model>
+                    <frontend_model>Biztech\Ausposteparcel\Block\Adminhtml\Enabledisable</frontend_model>
+                </field>
+
+
+
+                <field id="packagingAllowanceType" translate="label" type="select" sortOrder="38" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Packaging Allowance Type</label>
+                    <source_model>Magento\Shipping\Model\Source\HandlingType</source_model>
+                    <depends>
+                        <field id="carriers/ausposteParcel/useTotalOrderWeight">1</field>
+                    </depends>
+                    <tooltip>Use this option if you want to add additional weight to your order total to allow for packaging. Use 'Fixed' if you want to add a set weight to each order, or use Percentage to add an allowance based on a percentage of the total weight for each order.</tooltip>
+                </field>
+                <field id="packagingAllowanceValue" translate="label" type="text" sortOrder="39" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Packaging Allowance Value</label>
+                    <depends>
+                        <field id="carriers/ausposteParcel/useTotalOrderWeight">1</field>
+                    </depends>
+                    <tooltip>Depending on the option you choose for 'Packaging Allowance Type', this value will determine what value to add to the total weight of the combined items on an order. If you select Fixed, then input the additional weight you want to add in KG. eg. .25 for .25 kg/250 grams. If you select percentage, then input the percentage you want to add to an order eg. 5 for 5%. Leave this field empty if you don't want to apply a packaging allowance to orders.</tooltip>
+                    <validate>validate-number</validate>
+                </field>
+                <field id="eParcelShippingApplyAll" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Apply Parcel Send Shipping to All AU Orders</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Enabledisable</source_model>
+                    <frontend_model>Biztech\Ausposteparcel\Block\Adminhtml\Enabledisable</frontend_model>
+                    <tooltip>Select this option if you want to apply Parcel Send shipping and management to all of your existing Magento shipping rules and options, including orders via M2E Pro. If you would like to apply different Parcel Send shipping types to the different shipping methods you offer, we recommend you use our 'Assign Shipping Types' option instead.</tooltip>
+                </field>
+
+                <field id="transportable_by_air" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Transportable By Air</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <tooltip>If the goods being sent are dangerous but are permitted to be transported by air, set this value to 'true'.</tooltip>
+                </field>
+                <field id="dangerous_goods_declaration" translate="label" type="select" sortOrder="41" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Dangerous Goods Declaration</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\DangerousDoodsDeclaration</source_model>
+                    <tooltip>If the goods being sent are dangerous and the transportable_by_air value is 'true', then the DG Declaration becomes mandatory.</tooltip>
+                </field>
+
+                <field id="label_configuration" translate="label" type="label"  sortOrder="41" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>General Label Printing</label>
+                    <frontend_model>Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+                </field>
+                <field id="auspostBranding" translate="label" type="select" sortOrder="42" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Australia Post Branding</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <tooltip>Whether the Australia Post branding should be included on the labels.
+                        If you are using purchased stationary from Australia Post, then the generated labels should not include the branding. Default is "False".</tooltip>
+                </field>
+                <field id="leftOffest" translate="label" type="text" sortOrder="43" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Label Left Margin</label>
+                    <tooltip>Use this field to adjust the left margin of the page. Default is "0".</tooltip>
+                </field>
+                <field id="topOffset" translate="label" type="text" sortOrder="44" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Label Top Margin</label>
+                </field>
+                <field id="description" translate="label" type="textarea" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <validate>required-entry</validate>
+                    <label>Displayed Description in Label</label>
+                </field>
+                <!-- for domestic Label Printing -->
+                <field id="heading_domestic_label" translate="label" type="label"  sortOrder="46" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Domestic Label Printing </label>
+                    <frontend_model>Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+                </field>
+                <field id="labelParcelLayout" translate="label" type="select" sortOrder="47" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Label Layout for Parcel Post</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Labelparcellayout</source_model>
+                    <validate>required-entry</validate>
+                    <tooltip>The layout specifies the number of labels per page and the size of the page.
+                        The layout must be valid for the product types of the items in the shipment.</tooltip>
+                </field>
+                <field id="labelExpressLayout" translate="label" type="select" sortOrder="48" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Label Layout for Express Post</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Labelexpresslayout</source_model>
+                    <validate>required-entry</validate>
+                    <tooltip>The layout specifies the number of labels per page and the size of the page.
+                        The layout must be valid for the product types of the items in the shipment.</tooltip>
+                </field>
+                <!-- for Internation Label Printing -->
+                <field id="heading_international_label" translate="label" type="label"  sortOrder="49" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>International  Label Printing </label>
+                    <frontend_model>Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+                </field>
+                <field id="labelParcelLayoutInternational" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Label Layout for International</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Labelparcellayout</source_model>
+                    <validate>required-entry</validate>
+                    <tooltip>The layout specifies the number of labels per page and the size of the page.
+                        The layout must be valid for the product types of the items in the shipment.</tooltip>
+                </field>
+                <field id="commercialvalue" translate="label" type="select" sortOrder="51" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enable Commercial Value</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <validate>required-entry</validate>
+                    <tooltip>Whether the item has commercial value (i.e. the goods are for resale). This is generated by the merchant and will be shown on the customers form and label.</tooltip>
+                </field>
+                <field id="classificationtype" translate="label" type="select" sortOrder="52" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Choose Classification Type For International Label Printing</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Classificationtype</source_model>
+                    <validate>required-entry</validate>
+                    <tooltip>Category or classification of the goods.</tooltip>
+                    <depends>
+                        <field id="carriers/ausposteParcel/commercialvalue">0</field>
+                    </depends>
+                </field>
+                <field id="description_of_other" translate="label" type="textarea" sortOrder="53" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enter Description</label>
+                    <depends>
+                        <field id="carriers/ausposteParcel/commercialvalue">1</field>
+                    </depends>
+                </field>
+                <field id="consignment_configuration" translate="label" type="label"  sortOrder="54" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Consignment Configuration</label>
+                    <frontend_model>Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+                </field>
+                <field id="displayOrderStatus" translate="label" type="select" sortOrder="55" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Display Order Status on Consignment Grid</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Enabledisable</source_model>
+                    <frontend_model>Biztech\Ausposteparcel\Block\Adminhtml\Enabledisable</frontend_model>
+                    <tooltip>Set this option to Yes if you want the Magento order status for all orders to be displayed in the consignment Grid.</tooltip>
+                </field>
+                <field id="displayChoosenStatus" translate="label" type="select" sortOrder="56" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Choose the status to show in the consignment view</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Enabledisable</source_model>
+                    <frontend_model>Biztech\Ausposteparcel\Block\Adminhtml\Enabledisable</frontend_model>
+                    <tooltip>By default, orders that have a status of 'Pending', 'Processing' or have an open consignment against them are displayed in the Consignment View. If you'd like to choose different order status to display in the Consignment View then set this option to Yes.</tooltip>
+                </field>
+                <field id="chooseStatuses" translate="label" type="multiselect" sortOrder="57" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Select the Status</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Orderstatus</source_model>
+                    <frontend_model>Biztech\Ausposteparcel\Block\Adminhtml\Enabledisable</frontend_model>
+                    <depends>
+                        <field id="carriers/ausposteParcel/displayChoosenStatus">1</field>
+                    </depends>
+                    <validate>required-entry</validate>
+                    <tooltip>Select one or more order status to display in the Consignment View. Only orders with matching Order Status will be displayed in the Consignment View.</tooltip>
+                </field>
+                <!-- <field id="changeOrderStatus" translate="label" type="select" sortOrder="58" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Change Order Status on dispatch of Manifest</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Orderstatus</source_model>
+                    <frontend_model>Biztech\Ausposteparcel\Block\Adminhtml\Enabledisable</frontend_model>
+                    <tooltip>Use this option to change the order status when a manifest is dispatched.</tooltip>
+                </field> -->
+
+                <field id="manifest_configuration" translate="label" type="label"  sortOrder="59" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Manifest Configuration</label>
+                    <frontend_model>Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+                </field>
+                <field id="notifyCustomers" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Notify Customers on dispatch of Manifest</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Enabledisable</source_model>
+                    <frontend_model>Biztech\Ausposteparcel\Block\Adminhtml\Enabledisable</frontend_model>
+                    <tooltip>Use this option to notify customers of tracking numbers when a manifest is dispatched. This default can be overridden when creating consignments.</tooltip>
+                </field>
+                <field id="emailNotification" translate="label" type="select" sortOrder="61" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Australia Post Email Notification</label>
+                    <source_model>Biztech\Ausposteparcel\Model\Config\Source\Enabledisable</source_model>
+                    <frontend_model>Biztech\Ausposteparcel\Block\Adminhtml\Enabledisable</frontend_model>
+                    <tooltip>Default setting for using Australia Post's email notification service on consignments. This default can be overridden when creating consignments.</tooltip>
+                </field>
+                <field id="other_configuration" translate="label" type="label"  sortOrder="64" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Other Configuration</label>
+                    <frontend_model>Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+                </field>
+                <field id="changeShippingMethod" translate="label" type="select" sortOrder="65" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Change order shipping option</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <tooltip>Select this option if you want to change the order's current shipping option to other shipping options.</tooltip>
+                </field>
+                <field id="enable_addressvalidationfront" translate="label" type="select" sortOrder="66" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Allow Front End Suggestions for Address </label>
+                    <comment>This is only valid for "Australia" country</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+            <field id="hf_configuration" translate="label" type="label"  sortOrder="76" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Handling Fees Configuration</label>
+                    <frontend_model>Magento\Config\Block\System\Config\Form\Field\Heading</frontend_model>
+            </field>
+            <field id="handling_type" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="0">
+                <label>Calculate Handling Fee</label>
+                <source_model>Magento\Shipping\Model\Source\HandlingType</source_model>
+            </field>
+            <field id="handling_fee" translate="label" type="text" sortOrder="85" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Handling Fee</label>
+                <validate>validate-number validate-zero-or-greater</validate>
+            </field>
+            </group>
+        </section>
+    </system>
+</config>

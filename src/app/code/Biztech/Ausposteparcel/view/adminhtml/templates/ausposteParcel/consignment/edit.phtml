@@ -1,0 +1,208 @@
+<div class="content-header ad-header">
+    <h3 class="icon-head head-sales-order-invoice ad-title"><?php //echo $this->getHeaderText()  ?></h3>    
+    <p class="form-buttons ad-form-buttons">
+        <button onclick="setLocation('<?php echo $this->getBackUrl() ?>')" class="scalable back" type="button" title="Back">
+            <span><span><span>Back</span></span></span>
+        </button>
+        <button onclick="setLocation(window.location.href)" class="scalable " type="button" title="Reset">
+            <span><span><span>Reset</span></span></span>
+        </button>
+    </p>
+</div>
+<?php $objectManager = $this->getobjectManager(); ?>
+<?php $_order = $this->getOrder(); ?>
+<?php $consignment = $this->getConsignment($_order->getId()); ?>
+<?php $article = $this->getArticle()->getData();
+?>
+<?php
+$use_order_total_weight = (int) $this->getStoreConfig('carriers/ausposteParcel/useTotalOrderWeight');
+$use_article_dimensions = (int) $this->getStoreConfig('carriers/ausposteParcel/useArticleDimensions');
+if ($use_order_total_weight == 1) {
+    $weightPerArticle = $objectManager->create('Biztech\Ausposteparcel\Helper\Info')->getAllowedWeightPerArticle();
+}
+?>
+<form name="edit_form" id="edit_form" method="post" action="<?php echo $this->getSaveUrl() ?>">
+    <?php echo $this->getBlockHtml('formkey') ?>
+    <input id="order_id" type="hidden" name="order_id" value="<?php echo $this->getOrder()->getId() ?>" />
+    <!-- <input id="order_id" type="hidden" name="articles_type" value="<?php //echo $this->getOrder()->getId()  ?>" /> -->
+    <input id="articles_type" type="hidden" name="articles_type" value="Custom"/>
+    <input id="source" type="hidden" name="source" value="grid" />
+
+    <div class="box">
+        <h3>Article</h3>
+        <span class="field-row1">
+            <label class="normal" for="article_description">
+                <?php echo (__('Description:')); ?><span class="required">*</span>
+            </label>
+            <input id="article_description" name="article[description]" class="required-entry input-text admin__control-text" value="<?php echo $article['article_description'] ?>"/>
+        </span>
+        <span class="field-row1">
+            <label class="normal" for="article_weight">
+                <?php echo (__('Weight (Kgs):')); ?><span class="required">*</span>
+            </label>
+            <input size="10" id="article_weight" name="article[weight]" class="required-entry positive-number actual_weight maximum-value input-text admin__control-text" label="Weight" value="<?php echo $article['actual_weight'] ?>"/>
+        </span>
+        <?php //if ($use_article_dimensions == 1):  ?>
+        <span class="field-row1">
+            <label class="normal" for="article_height">
+                <?php echo (__('Height (cm):')); ?>
+            </label>
+            <input size="10" id="article_height" name="article[height]" class="positive-number input-text admin__control-text" label="Height" value="<?php echo $article['height'] ?>"/>
+        </span>
+        <span class="field-row1">
+            <label class="normal" for="article_width">
+                <?php echo (__('Width (cm):')); ?>
+            </label>
+            <input size="10" id="article_width" name="article[width]" class="positive-number input-text admin__control-text" label="Width" value="<?php echo $article['width'] ?>"/>
+        </span>
+        <span class="field-row1">
+            <label class="normal" for="article_length">
+                <?php echo (__('Length (cm):')); ?>
+            </label>
+            <input size="10" id="article_length" name="article[length]" class="positive-number input-text admin__control-text" label="Length" value="<?php echo $article['length'] ?>"/>
+        </span>
+        <span class="field-row1">
+            <label class="normal" for="unit_value">
+                <?php echo (__('Unit Value:')); ?>
+            </label>
+            <input size="10" id="unit_value" name="article[unit_value]" class="positive-number input-text admin__control-text" label="Unit Value" value="<?php echo $article['unit_value'] ?>"/>
+        </span>
+
+        <table width="100%">
+            <tr>
+                <td style="width : 21%; padding-bottom: 25px;"><?php echo (__('Enable Transit Cover Amount')); ?></td>
+                <td><select id="transit_cover_required" class="select admin__control-select" style="width : 25%; margin-bottom: 18px;" name="transit_cover_required">
+                        <option value="1" <?php echo ($article['is_transit_cover_required'] == 'Y' ? 'selected' : '') ?>>Yes</option>
+                        <option value="0" <?php echo ($article['is_transit_cover_required'] != 'Y' ? 'selected' : '') ?>>No</option>
+                </select></td>
+            </tr>
+            <tr>
+                <td style="width : 21%; padding-bottom: 25px;"><?php echo (__('Transit Cover Amount')); ?></td>
+                <td><input id="transit_cover_amount" class="positive-number input-text admin__control-text" style="width : 25%; margin-bottom: 18px;" label="Transit Cover Amount" name="transit_cover_amount" value="<?php echo $article['transit_cover_amount'] ?>" /></td>
+            </tr>
+        </table>
+    </div>
+    <button onclick="return submitForm()" class="scalable save submit-button" type="button" title="Submit"><span><span><span>Update Article</span></span></span></button>
+    <br><br>
+    <div class="box">
+        <h3>Consignment Fields</h3>
+         <table width="100%" border="0" cellspacing="6" cellpadding="6" class="tablecustom ad-table">
+                <tr>
+                    <td style="width : 35%" width="20%"><?php echo (__('Allow Partial Delivery')); ?></td>
+                    <td style="width : 70%"><?php echo($consignment['partial_delivery_allowed'] == 1 ? 'Yes' : 'No') ?></td>
+                </tr>
+                <?php if ($objectManager->create('Biztech\Ausposteparcel\Helper\Info')->isCashToCollect($_order->getId())): ?>
+                    <tr>
+                        <td style="width : 35%"><?php echo (__('Cash to collect')); ?></td>
+                        <td style="width : 70%"><?php echo $consignment['cash_to_collect'] ?></td>
+                    </tr>
+                <?php endif; ?>
+                <tr>
+                    <td style="width : 35%"><?php echo (__('Enable Delivery Signature')); ?></td>
+                    <td style="width : 70%"><?php echo($consignment['delivery_signature_allowed'] == 1 ? 'Yes' : 'No') ?></td>
+                </tr>
+                <tr>
+                    <td style="width : 35%"><?php echo (__('Is Shipment Contains Dangerous Goods ?')); ?></td>
+                    <td style="width : 70%"><?php echo($consignment['contains_dangerous_goods'] == 1 ? 'Yes' : 'No') ?></td>
+                </tr>
+                <tr>
+                    <td style="width : 35%"><?php echo (__('Print Return Labels')); ?></td>
+                    <td style="width : 70%"><?php echo($consignment['print_return_labels'] == 1 ? 'Yes' : 'No') ?></td>
+                </tr>
+                <tr>
+                    <td style="width : 35%"><?php echo (__('Australia Post Email Notification')); ?></td>
+                    <td style="width : 70%"><?php echo($consignment['email_notification'] == 1 ? 'Yes' : 'No') ?></td>
+                </tr>
+                <tr>
+                    <td style="width : 35%"><?php echo (__('Notify Customers on dispatch of Manifest')); ?></td>
+                    <td style="width : 70%"><?php echo($consignment['notify_customers'] == 1 ? 'Yes' : 'No') ?></td>
+                </tr>
+                <tr>
+                    <td style="width : 35%"><?php echo (__('Delivery Instructions')); ?></td>
+                    <td style="width : 70%"><?php echo($consignment['delivery_instructions'] == null ? 'N/A' : $consignment['delivery_instructions']) ?></td>
+                </tr>
+            </table>
+        </div>
+    <div class="clear"></div>
+
+    
+    <!-- <button class="scalable save submit-button" type="submit" title="Submit"><span><span><span>Update Article</span></span></span></button> -->
+
+</form>
+<script type="text/javascript">
+    require([
+        'jquery',
+        'jquery/ui',
+        'Magento_Ui/js/modal/modal',
+        'Magento_Sales/order/view/post-wrapper',
+        'Magento_Sales/order/create/giftmessage'
+    ], function ($) {
+        $jEparcel = jQuery.noConflict();
+
+    });
+</script>
+<script>
+<?php if ($use_order_total_weight == 1): ?>
+        var weightPerArticle = '<?php echo $weightPerArticle ?>';
+<?php endif; ?>
+    function submitForm()
+    {
+        var valid = true;
+        $jEparcel('.required-entry').each(function () {
+            var value = $jEparcel.trim($jEparcel(this).val());
+            if (value.length == 0 && valid)
+            {
+                valid = false;
+            }
+        });
+        if (!valid)
+        {
+            alert('Please enter all the mandatory fields');
+            return false;
+        }
+        $jEparcel('.positive-number').each(function () {
+            var value = $jEparcel.trim($jEparcel(this).val());
+            var label = $jEparcel(this).attr('label');
+            if (isNaN(value))
+            {
+                alert(label + ' should be a number');
+                valid = false;
+            }
+
+            value = parseInt(value);
+            if (value < 0)
+            {
+                alert(label + ' should be a postive number');
+                valid = false;
+            }
+
+        });
+        if (!valid)
+        {
+            return false;
+        }
+
+<?php if ($use_order_total_weight == 1): ?>
+            $jEparcel('.maximum-value').each(function () {
+                var value = $jEparcel.trim($jEparcel(this).val());
+                var label = $jEparcel(this).attr('label');
+                value = parseFloat(value);
+                if (value > weightPerArticle)
+                {
+                    alert('Allowed weight per article is ' + weightPerArticle);
+                    valid = false;
+                }
+
+            });
+            if (!valid)
+            {
+                return false;
+            } else
+            {
+                $('edit_form').submit();
+            }
+<?php else: ?>
+            $('edit_form').submit();
+<?php endif; ?>
+    }
+</script>

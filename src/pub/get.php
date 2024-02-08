@@ -49,10 +49,8 @@ $relativePath = $request->getPathInfo();
 if (file_exists($configCacheFile) && is_readable($configCacheFile)) {
     $config = json_decode(file_get_contents($configCacheFile), true);
 
-    // Checking update time
-    if (isset($config['update_time'], $config['media_directory'], $config['allowed_resources'])
-        && filemtime($configCacheFile) + $config['update_time'] > time()
-    ) {
+    //checking update time
+    if (filemtime($configCacheFile) + $config['update_time'] > time()) {
         $mediaDirectory = $config['media_directory'];
         $allowedResources = $config['allowed_resources'];
 

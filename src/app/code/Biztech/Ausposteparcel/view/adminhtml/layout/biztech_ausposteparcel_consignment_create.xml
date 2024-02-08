@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <head>
+        <css src="Biztech_Ausposteparcel::css/customeparcel.css"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="Biztech\Ausposteparcel\Block\Adminhtml\Consignment\Create"/>
+            <block template="Biztech_Ausposteparcel::ausposteParcel/consignment/hidestatusselector.phtml" class="Biztech\Ausposteparcel\Block\Adminhtml\Labelprinted"/>
+        </referenceContainer>
+    </body>
+</page>

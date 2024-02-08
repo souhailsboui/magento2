@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <carriers>
+            <ausposteParcel>
+                <active>0</active>
+                <method>Australia Post</method>
+                <partner_id>BIZTECHCONS-7906</partner_id>
+                <sallowspecific>0</sallowspecific>
+                <showmethod>1</showmethod> 
+                <model>Biztech\Ausposteparcel\Model\Carrier\AusposteParcel</model>
+                <name>Australia Post</name>
+                <price>0.0</price> 
+                <title>Australia Post</title>
+                <specificerrmsg>This shipping method is currently unavailable. If you would like to ship using this shipping method, please contact us.</specificerrmsg>
+                <length_attribute>length</length_attribute>
+                <height_attribute>height</height_attribute>
+                <width_attribute>width</width_attribute>
+                <weight_unit>kg</weight_unit>
+                <length_value>15</length_value>
+                <height_value>15</height_value>
+                <width_value>15</width_value>
+                <default_weight>0</default_weight>
+            </ausposteParcel>
+        </carriers>
+        <ausposteParcel>
+            <email>
+                <carriers_ausposteParcel_emailTemplate>carriers_ausposteParcel_emailTemplate</carriers_ausposteParcel_emailTemplate>
+            </email>
+        </ausposteParcel>
+    </default>
+</config>

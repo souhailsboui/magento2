@@ -15,7 +15,6 @@ use Magento\ImportExport\Model\ResourceModel\Import\Data;
 use Psr\Log\LoggerInterface;
 use Magento\Sales\Model\Service\InvoiceService;
 use Magento\Framework\DB\Transaction;
-
 use Magento\Catalog\Model\Product;
 use Magento\Quote\Model\QuoteFactory;
 use Magento\Quote\Model\QuoteManagement;
@@ -242,7 +241,7 @@ class Orders extends AbstractEntity
         $behavior = $this->getBehavior();
         $rows = [];
         $entityList = [];
-        while ($bunch = $this->_dataSourceModel->getNextUniqueBunch($this->getIds())) {
+        while ($bunch = $this->_dataSourceModel->getNextBunch()) {
 
             foreach ($bunch as $rowNum => $row) {
                 if (!$this->validateRow($row, $rowNum)) {

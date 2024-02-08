@@ -1,0 +1,552 @@
+<?php
+    $enable_product_widget = $this->isProductWidgetEnabled();
+
+    $current_product = $this->getCurrentProduct();
+
+
+    $lookup_field_title = $this->productWidgetLookupFieldTitle();
+    $lookup_field_placeholder = $this->productWidgetLookupFieldPlaceholder();
+
+    $product_id = null;
+
+    $configurable = false;
+
+    if($current_product) {
+        $product_id = $current_product->getId();
+
+        if($current_product->getTypeId() == \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE){
+            $configurable = true;
+        }
+    }
+
+    $child_products = [];
+
+    if($configurable) {
+        $child_products = $this->getChildProducts();
+    }
+
+    // dd($child_products);
+
+    $child_product_ids_with_live_rates_enabled = [];
+
+    foreach($child_products as $child_product) {
+        $child_product_id = $child_product->getID();
+
+        $child_product_use_live_rates = $this->useFusedshipRates($child_product_id);
+
+        if($child_product_use_live_rates) {
+            $child_product_ids_with_live_rates_enabled[] = $child_product_id;
+        }
+    }
+
+    $product_use_live_rates = $this->useFusedshipRates($product_id);
+
+    $currency_symbol = '$';
+
+    $current_currency = $this->getCurrentCurrency();
+
+    if($current_currency) {
+        $currency_symbol = $current_currency->getCurrencySymbol();
+    }
+
+    $display_in_popup = $this->displayInPopup() ?? false;
+
+    $popup_button_label = $this->popupButtonLabel() ?? 'Get a Quick Shipping Quote';
+
+    $widget_title = $this->productWidgetTitle() ?? 'Quick Quote';
+
+    $widget_description = $this->productWidgetDescription() ?? '';
+
+    $widget_button_style = $configurable ? 'display:none;clear:both;' : 'display:block;clear:both;';
+
+
+    $child_product_ids_with_live_rates_enabled_json_str = json_encode($child_product_ids_with_live_rates_enabled);
+
+    $rateTriggerCharacter = $this->rateTriggerCharacter();
+
+    $isShowResidentialOpt = $this->isShowResidentialOption();
+
+    $defaultResBusOption = $this->getDefaultResBusOption();
+?>
+<?php if($enable_product_widget && ( $product_use_live_rates || $configurable) && !is_null($product_id)): ?>
+    <?php if($display_in_popup):?>
+        <br/>
+        <button type="button" title="<?php echo $popup_button_label; ?>" class="action primary" style="<?php echo $widget_button_style; ?>" id="fusedship-quick-quote-button">
+        <span><?php echo $popup_button_label; ?></span>
+        </button>
+        <br/>
+        <br/>
+    <?php endif;?>
+    <input type="hidden" id="child_product_ids_with_live_rates_enabled" value="<?php echo htmlspecialchars($child_product_ids_with_live_rates_enabled_json_str); ?>"/>
+    <input type="hidden" id="product_is_configurable" value="<?php echo $configurable; ?>"/>
+    <input type="hidden" id="fusedship-display-in-popup" value="<?php echo $display_in_popup; ?>"/>
+    <div id="fusedship-popup-modal" style="visibility:hidden">
+        <div class="fusedship-quick-quote-form" style="display:block;width:100%;clear:both;">
+            <fieldset class="fieldset">
+                <input type="hidden" id="fusedship-current-product" value="<?php  echo $product_id; ?>"/>
+                <input type="hidden" id="fusedship-current-currency" value="<?php  echo $currency_symbol; ?>"/>
+                <legend class="legend review-legend"><span><?php echo $widget_title; ?></span></legend>
+                <br/>
+
+                <?php if ($isShowResidentialOpt) { ?>
+                <div class="field fusedship-residential-business">
+
+                    <label class="label">The delivery address is a</label>
+
+                    <div class="control">
+                        <input type="radio" class="input-radio " value="1" name="is_residential" id="is_residential" <?php echo $defaultResBusOption == '1' ? 'checked="checked"' : ''; ?>>
+                        <label for="is_residential" class="radio">Residential</label>
+                        <input type="radio" class="input-radio" value="2" name="is_residential" id="is_business" <?php echo $defaultResBusOption == '2' ? 'checked="checked"' : ''; ?>>
+                        <label for="is_business" class="radio">Business</label></span>
+                    </div>
+                </div>
+                <?php } ?>
+
+                <div class="field quick-quote-field-lookup">
+                    <label for="fusedship_address_lookup_field" class="label"><span><?php echo $lookup_field_title ?? ''; ?></span></label>
+                    <div class="control">
+                        <input
+                            type="text"
+                            name="fusedship_address_lookup_field"
+                            id="fusedship_address_lookup_field"
+                            class="input-text"
+                            placeholder="<?php echo $lookup_field_placeholder ?? ''; ?>"
+                            autocomplete="one-time-code">
+                    </div>
+                </div>
+
+                <div class="field quick-quote-field-result" style="display:none;">
+                    <div class="control">
+                        <select class="select" name="fusedship_address_results_field" id="fusedship_address_results_field"></select>
+                    </div>
+                </div>
+
+                <div class="quickquote-loader">
+                    <img src="<?= $block->escapeUrl($block->getViewFileUrl('images/loader-2.gif')); ?>"" alt="">
+                    <p><?php echo $this->rateMessage(); ?></p>
+                </div>
+
+                <div class="fusedship-table-wrapper">
+                    <div class="table-wrapper">
+                        <table class="data table" id="fusedship-quick-quote-rates-result-table">
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div><?php echo $widget_description; ?></div>
+            </fieldset>
+        </div>
+    </div>
+
+    <style>
+        .modal-popup._inner-scroll .modal-inner-wrap {
+            width: 40% !important;
+        }
+
+        .quickquote-loader {
+            text-align: center;
+            display: none;
+            padding-bottom: 30px;
+        }
+
+        .quickquote-loader p {
+            font-weight: 900;
+            margin-top: -40px;
+        }
+
+        .fusedship-residential-business {
+            padding-bottom: 10px;
+        }
+
+        .fusedship-residential-business .control {
+            display: flex;
+            margin-top: 15px;
+            margin-bottom: 15px;
+
+        }
+
+        .fusedship-residential-business .control label {
+            margin-right: 30px;
+        }
+    </style>
+    <script type="text/javascript">
+        require([
+            'jquery', 'mage/url', 'Magento_Ui/js/modal/modal', 'underscore', 'loader',
+        ], function($, url, modal, _, loader){
+            $(function () {
+                var child_product_ids_with_live_rates_enabled = JSON.parse($('#child_product_ids_with_live_rates_enabled').val());
+
+                var product_is_configurable = $('#product_is_configurable').val();
+                var selected_simple_id;
+                var quote_obj = {
+                    address: {},
+                    address_search: null,
+                    product_id: null,
+                    isResidential: $('.fusedship-residential-business input[type="radio"]:checked').val()
+                };
+
+                var display_in_popup = $("#fusedship-display-in-popup").val();
+
+                var options = {
+                    type: 'popup',
+                    responsive: true,
+                    innerScroll: true,
+                    modalClass: 'fusedship-popup-modal',
+                    buttons: []
+                };
+                var is_residential_opts_exist = jQuery('.fusedship-residential-business').length > 0;
+
+                if(display_in_popup == 'true' || display_in_popup == true || display_in_popup == 1) {
+                    var popup = modal(options, $('#fusedship-popup-modal'));
+                }
+
+                $(document.body).on('change', '.product-options-wrapper [aria-required="true"]', function() {
+                    var req_fields = $('.product-options-wrapper [aria-required="true"]');
+                    var count_values = 0;
+
+                    if (req_fields.length === 0) {
+                        return;
+                    }
+
+                    req_fields.each(function() {
+                       if ($(this).val() !== '') {
+                        count_values++;
+                       }
+                    });
+
+                    selected_simple_id = null;
+
+                    if (count_values >= req_fields.length) {
+
+                        // now lets get value from
+                        selected_simple_id = $('[name="selected_configurable_option"]').val();
+
+                        toggleProductWidget('show');
+                    } else {
+                        toggleProductWidget('hide');
+                    }
+                });
+
+
+                $(document).on('change',  '.swatch-select', function() {
+                    selpro();
+                });
+
+                $(document).on('click', '.swatch-option', function () {
+                    selpro();
+                });
+
+                function selpro () {
+                    selected_simple_id = null;
+                    var selected_options = {};
+                    $('div.swatch-attribute').each(function(k,v){
+                        var attribute_id    = $(v).attr('data-attribute-id');
+                        var option_selected = $(v).attr('data-option-selected');
+                        if(!attribute_id || !option_selected){ return;}
+                        selected_options[attribute_id] = option_selected;
+                    });
+
+                    var product_id_index = $('[data-role=swatch-options]').data('mageSwatchRenderer').options.jsonConfig.index;
+
+                    var simple_id;
+
+                    $.each(product_id_index, function(product_id,attributes){
+                        var productIsSelected = function(attributes, selected_options){
+                            return _.isEqual(attributes, selected_options);
+                        }
+                        if(productIsSelected(attributes, selected_options)){
+                            simple_id = product_id;
+                        }
+                    });
+
+                    toggleProductWidget('hide');
+
+                    if(simple_id) {
+                        if($.isArray(child_product_ids_with_live_rates_enabled) && child_product_ids_with_live_rates_enabled.includes(simple_id)) {
+                            selected_simple_id = simple_id;
+
+                            toggleProductWidget('show');
+                        }
+                    }
+                }
+
+                function toggleProductWidget(display) {
+                    var tgt = '';
+
+                    if(display_in_popup == 'true' || display_in_popup == true || display_in_popup == 1) {
+                        tgt = '#fusedship-quick-quote-button';
+                    } else {
+                        tgt = '.fusedship-quick-quote-form';
+                    }
+
+                    if(display == 'show') {
+                        $(tgt).show();
+                    } else {
+                        $(tgt).hide();
+                    }
+                }
+
+
+                $("#fusedship-quick-quote-button").on('click',function(e){
+                    e.preventDefault();
+
+                    const old_prod_id = quote_obj.product_id
+
+                    setProductId();
+
+                    // now we need to determine if the
+                    if (old_prod_id != null && old_prod_id !== quote_obj.product_id) {
+                        console.log("reset quick quote, for new product variation selected");
+
+                        quickQuote(quote_obj.address);
+
+                    }
+
+                    $("#fusedship-popup-modal").modal("openModal");
+
+                    return false;
+                });
+
+                var looking_up = false;
+
+                var currency_symbol = $('#fusedship-current-currency').val();
+
+                function setProductId() {
+                    var prod_id = $('#fusedship-current-product').val();
+
+
+                    if((product_is_configurable == 'true' || product_is_configurable == true) && selected_simple_id) {
+                        prod_id = selected_simple_id;
+                    }
+
+                    quote_obj.product_id = prod_id;
+                }
+
+                function renderShippingMethods(data) {
+                    var trow = '';
+
+                    if(data && data.hasOwnProperty('data')) {
+
+                        var shippingMethods = data.data;
+
+                        for(var i = 0; i < shippingMethods.length; i++) {
+                            trow += '<tr>';
+                            trow += '<td>' + currency_symbol + shippingMethods[i].amount + '</td>';
+                            trow += '<td>' + shippingMethods[i].carrier_title + '</td>';
+                            trow += '<td>' + shippingMethods[i].method_title + '</td>';
+                            trow += '</tr>';
+                        }
+                    }
+
+                    $('#fusedship-quick-quote-rates-result-table tbody').html(trow);
+                }
+
+                function quickQuote(addressData) {
+
+                    // must required residential/business selected if the option for that is enabled/visible
+                    if (is_residential_opts_exist && quote_obj.isResidential == null) {
+                        console.log("Must required is residential/business");
+                        return;
+                    }
+
+                    // must validate the city / country
+                    if (!addressData.city || !addressData.postcode) {
+                        console.log("Must required city or postcode");
+                        return;
+                    }
+
+
+                    var linkUrl = url.build('fusedship/index/quickquote');
+
+                    renderShippingMethods(null);
+
+                    $('.quickquote-loader').show();
+
+                    $.ajax({
+                        type: 'GET',
+                        url: linkUrl,
+                        data: {
+                            postcode: addressData.postcode,
+                            city: addressData.city,
+                            country: addressData.countryId,
+                            region: addressData.regionCode,
+                            product_id: quote_obj.product_id,
+                            quantity: $('#qty').val(),
+                            is_residential: quote_obj.isResidential
+                        },
+                        success: function (response) {
+
+                            renderShippingMethods(response);
+
+                            $('.quickquote-loader').hide();
+                            quote_obj.address_search = '';
+
+                        },
+                        error: function (err) {
+
+                            $('.quickquote-loader').hide();
+                            quote_obj.address_search = '';
+                        }
+                    });
+                }
+
+
+                function buildAddressSelection(data) {
+                    var optionsHtml = '<option>Please select</option>';
+
+                    for(var i=0; i < data.length; i++) {
+
+                        var magentoRegionData = data[i].magentoRegionData;
+
+                        var region_id = null;
+                        var region_code = null;
+                        var region_name = null;
+
+                        if(magentoRegionData) {
+                            region_id = magentoRegionData.region_id;
+                            region_code = magentoRegionData.code;
+                            region_name = magentoRegionData.name;
+                        }
+
+                        var selected = '';
+
+                        optionsHtml += '<option value="'+ data[i].id +'" data-postcode="'+ data[i].postcode +'" data-suburb="'+ data[i].suburb +'" data-country="'+ data[i].country.code2 +'" data-state-code="'+ region_code +'" data-state-name="'+ region_name +'" data-region-id="'+ region_id +'" '+ selected +'>' + data[i].description + '</option>';
+                    }
+
+                    return optionsHtml;
+                }
+
+                function addressLookup(elem, q) {
+                    if(looking_up) return;
+
+                    var linkUrl = url.build('fusedship/index/addresslookup');
+
+                    var result_select = $('.quick-quote-field-result');
+
+                    looking_up = true;
+
+
+                    $('body').trigger('processStart');
+
+                    $(result_select).hide();
+
+                    $(elem).attr('disabled', true);
+
+
+                    $.ajax({
+                        type: 'GET',
+                        url: linkUrl,
+                        data: {
+                            q: q
+                        },
+                        success: function (response) {
+                            looking_up = false;
+                            var data = response.data;
+
+                            var optionsHtml = buildAddressSelection(data);
+
+                            $('#fusedship_address_results_field').html(optionsHtml);
+
+                            if(optionsHtml != '') {
+                                $(result_select).show();
+
+                                // $(document).find('select[name="custom_attributes[address_lookup_results_field]"]').trigger('change');
+                            }
+
+                            $('body').trigger('processStop');
+
+                            $(elem).removeAttr('disabled');
+
+                        },
+                        error: function (err) {
+                            looking_up = false;
+                            $(elem).removeAttr('disabled');
+                            console.log(err);
+
+                            $('body').trigger('processStop');
+                        }
+                    });
+                }
+
+                function delay(callback, ms) {
+                    var timer = 0;
+                    return function() {
+                        var context = this, args = arguments;
+                        clearTimeout(timer);
+                        timer = setTimeout(function () {
+                            callback.apply(context, args);
+                        }, ms || 0);
+                    };
+                }
+
+
+                $(document).on('change', 'select[name="fusedship_address_results_field"]', function (e) {
+
+                    if($(this).val() == 'Please select') return;
+
+                    var postcode = $(this).find('option:selected').data('postcode');
+                    var country_code = $(this).find('option:selected').data('country');
+                    var location_id = $(this).val();
+                    var region_id = $(this).find('option:selected').data('regionId');
+                    var city = $(this).find('option:selected').data('suburb');
+                    var region_code = $(this).find('option:selected').data('stateCode');
+                    var region_name = $(this).find('option:selected').data('stateName');
+
+                    var selected_text = $(this).find('option:selected').text();
+
+
+                    $('input[name="fusedship_address_lookup_field"]').val(selected_text).trigger('change');
+
+
+                    $('.quick-quote-field-result').hide();
+
+
+                    var address = {};
+
+                    address.postcode = postcode;
+                    address.city = city;
+                    address.countryId = country_code;
+                    address.regionId = region_id;
+                    address.regionCode = region_code;
+                    address.region = region_name;
+
+                    // store the address
+                    quote_obj.address = address;
+
+                    setProductId();
+                    quickQuote(address);
+                });
+
+                $(document).on('keyup', 'input[name="fusedship_address_lookup_field"]', delay(function (e) {
+                    var q = $(this).val();
+
+                    // covert to string
+                    q += "";
+
+                    if (quote_obj.address_search === q && $('#fusedship_address_results_field').html() != '') {
+                        return;
+                    }
+
+                    quote_obj.address_search = q;
+
+                    if(q.length < <?php echo $rateTriggerCharacter; ?>)  return;
+
+                    addressLookup($(this), q);
+                }, 500));
+
+
+                $(document).on('click', 'input[name="fusedship_address_lookup_field"]', function (e) {
+                    $(this).select();
+                });
+
+                $(document).on('click', '.fusedship-residential-business input[type="radio"]', function (e) {
+                    quote_obj.isResidential = $(this).val() == 1;
+                    quickQuote(quote_obj.address);
+                });
+
+                $('#fusedship-popup-modal').css('visibility', 'visible');
+            });
+        });
+    </script>
+<?php endif; ?>

@@ -1,0 +1,207 @@
+<?php
+
+namespace Biztech\Ausposteparcel\Controller\Adminhtml\Consignment;
+
+use Magento\Backend\App\Action;
+use Magento\Backend\App\Action\Context;
+use Magento\Framework\View\Result\PageFactory;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+class MassGenerateAndDownloadLabels extends Action
+{
+    public $order;
+    public $apimodel;
+    public $consignmentmodel;
+    protected $pdf_manager;
+    public function __construct(
+        Context $context,
+        PageFactory $resultPageFactory,
+        \Magento\Sales\Api\Data\OrderInterface $order,
+        \Biztech\Ausposteparcel\Model\Api $apimodel,
+        \Biztech\Ausposteparcel\Model\Consignment $consignmentmodel,
+        \Clegginabox\PDFMerger\PDFMerger $pdfmanager
+    ) {
+        parent::__construct($context);
+        $this->messageManager = $context->getMessageManager();
+        $this->order = $order;
+        $this->apimodel = $apimodel;
+        $this->consignmentmodel = $consignmentmodel;
+        $this->pdf_manager = $pdfmanager;
+    }
+
+    public function execute()
+    {
+        if(!class_exists('Clegginabox\PDFMerger\PDFMerger')) {
+            $this->messageManager->addError('For the mass label generate you need to install pdfMerge module on yout site. Please fire <b>composer require clegginabox/pdf-merger:dev-master</b> command on your site root directoty. ');
+                        $this->_redirect('*/*/index');
+                        return true;
+        }
+        $getParams = $this->getRequest()->getParams();
+        $ids = $getParams['order_consignment'];
+        $consignments = [];
+        if (!isset($ids)) {
+            $this->messageManager->addError(__('Please select item(s)'));
+            $this->_redirect('*/*/index');
+            return true;
+        } else {
+            if (!is_array($ids)) {
+                $ids = explode(',', $ids);
+            }
+            foreach ($ids as $key => $value) {
+                $order_ids[] = explode('_', $value);
+            }
+            $ignoreLabels = [];
+            foreach ($order_ids as $key1 => $value1) {
+                $orderId = $value1[0];
+                $consignmentNumber = $value1[1];
+                $orderData = $this->order->load($orderId)->getData();
+                if ($orderData['eparcel_shipping_id'] != '') {
+                    $shipmentData[$key1]['shipmentId'] = $orderData['eparcel_shipping_id'];
+                    $shipmentData[$key1]['consignment_id'] = $consignmentNumber;
+                    $consignments[] = $consignmentNumber;
+                } else {
+                    $ignoreLabels[] = $consignmentNumber;
+                }
+            }
+
+            if (!empty($ignoreLabels)) {
+                $ignoreConsignmentIds = implode(",", $ignoreLabels);
+                $message = __("Cannot Download Label for consignment(s) numbers " . $ignoreConsignmentIds . " please generate shipment first!");
+                $this->messageManager->addError($message);
+            }
+            if (isset($shipmentData)) {
+                $finalDataToSend = ['shipment_id' => $shipmentData];
+
+                $getResponse = $this->apimodel->massLabelGenerateAndDownload($finalDataToSend);
+                if ($getResponse != null) {
+                    $this->jsonHelper = $this->_objectManager->get('Magento\Framework\Json\Helper\Data');
+                    $decodeResponse = $this->jsonHelper->jsonDecode($getResponse, true);
+
+                    foreach ($decodeResponse as $key => $value) {
+                        if ($key == 'status' && $value == 'success' || $key == 'url') {
+                            if (is_array($value)) {
+                                $consignmentsLabels = $value;
+                            }
+                        }
+                    }
+                    if (empty($consignmentsLabels)) {
+                        $this->messageManager->addError("Cannot Download label. It might be available soon try after some time.");
+                        $this->_redirect('*/*/index');
+                        return true;
+                    }
+                    $finalArray = [];
+                    foreach ($consignmentsLabels as $key => $value) {
+                        $timestamp = time();
+                        $date = date('Y-m-d H:i:s', $timestamp);
+                        $labelUrl = '';
+                        if (isset($value['label_url']) || isset($value['pdf_url'])) {
+                            $labelUrl = (isset($value['label_url'])) ? $value['label_url'] : $value['pdf_url'];
+                            /*$consignmentModel = $this->consignmentmodel->load($value['consignment_number'], 'consignment_number')
+                                    ->setIsLabelCreated(1)
+                                    ->setIsLabelPrinted(1)
+                                    ->setModifyDate($date)
+                                    ->save();
+                            $orderId = $consignmentModel->getOrderId();
+                            $orderToPrepare = $this->order->load($orderId);
+                            $orderToPrepare->setIsLabelGenerated(1)
+                                    ->setIsLabelPrinted(1)
+                                    ->save();*/
+                        }
+
+                        if (in_array($labelUrl, $finalArray)) {
+                            continue;
+                        } else {
+                            array_push($finalArray, $labelUrl);
+                        }
+                    }
+                    foreach ($shipmentData as $data) {
+                        $consignmentModel = $this->consignmentmodel->load($data['consignment_id'], 'consignment_number');
+                        if (isset($decodeResponse['request_id']) && ( is_null($consignmentModel->getLabelRequestId()) )) {
+                            $consignmentModel->setIsLabelCreated(1)
+                            ->setIsLabelPrinted(1)
+                            ->setModifyDate($date)
+                            ->setLabelRequestId($decodeResponse['request_id'])
+                            ->save();
+                            $orderId = $consignmentModel->getOrderId();
+                            $orderToPrepare = $this->order->load($orderId);
+                            $orderToPrepare->setIsLabelGenerated(1)
+                                        ->setIsLabelPrinted(1)
+                                        ->save();
+                        } else {
+                            $consignmentModel->setIsLabelCreated(1)
+                                        ->setIsLabelPrinted(1)
+                                        ->setModifyDate($date)
+                                        ->save();
+                            $orderId = $consignmentModel->getOrderId();
+                            $orderToPrepare = $this->order->load($orderId);
+                            $orderToPrepare->setIsLabelGenerated(1)
+                                        ->setIsLabelPrinted(1)
+                                        ->save();
+                        }
+                    }
+                    
+                    $fileSystem = $this->_objectManager->create('\Magento\Framework\Filesystem');
+                    $filePath = $fileSystem->getDirectoryRead(\Magento\Framework\App\Filesystem\DirectoryList::MEDIA)->getAbsolutePath();
+                    $dir = $filePath . 'biztech/eParcelPdf';
+                    if (!is_dir($dir)) {
+                        mkdir($dir, 0777, true);
+                    }
+                    foreach ($finalArray as $i => $j) {
+                        $name = $i + 1;
+                        $dirPath = $dir . "/" . $name . ".pdf";
+                        $labelPath = $j;
+                        file_put_contents($dirPath, file_get_contents($labelPath));
+                        $fileArray[] = $dirPath;
+                    }
+                    
+                    $outputName = $dir . "/" . time() . "_Labels.pdf";
+
+                   /* $cmd = "gs -q -dNOPAUSE -dBATCH -dAutoRotatePages=/None -sDEVICE=pdfwrite -sOutputFile=$outputName ";
+                   foreach ($fileArray as $file) {  
+                        $cmd .= $file . " ";    
+                    }   
+                    //Add each pdf file to the end of the command
+                    $result = shell_exec($cmd);*/
+
+                    foreach ($fileArray as $file) {
+                        $this->pdf_manager->addPDF($file, 'all');
+                    }
+                    $this->pdf_manager->merge('file', $outputName, 'P');
+
+
+                    $filenameFinal = time() . "_AllLabels.pdf";
+                    $pdfurl = $outputName;
+                    $content = file_get_contents($pdfurl);
+                    //$content = file_get_contents($file);
+
+                    foreach ($fileArray as $key => $value) {
+                        if (file_exists($value)) {
+                            unlink($value);
+                        }
+                    }
+
+                    unlink($pdfurl);
+
+                    return $this->_sendUploadResponse($filenameFinal, $content);
+                }
+            }
+            $this->_redirect('*/*/index');
+        }
+    }
+
+    public function _sendUploadResponse($fileName, $content, $contentType = 'application/pdf')
+    {
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $response = $objectManager->get('\Magento\Framework\App\ResponseInterface');
+        $response->setHttpResponseCode(200);
+        $response->setHeader('Pragma', 'public', true);
+        $response->setHeader('Cache-Control', 'must-revalidate, post-check=0, pre-check=0', true);
+        $response->setHeader('Content-Disposition', 'attachment; filename=' . $fileName);
+        $response->setHeader('Last-Modified', date('r'));
+        $response->setHeader('Accept-Ranges', 'bytes');
+        $response->setHeader('Content-Length', strlen($content));
+        $response->setHeader('Content-type', $contentType);
+        $response->setBody($content);
+        $response->sendResponse();
+        return;
+    }
+}

@@ -1,0 +1,160 @@
+<?php
+$protocol = 'http';
+if (isset($_SERVER['HTTPS']) && (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) != 'off'))
+    $protocol = 'https';
+
+$currentStore = $block->getBaseUrl();
+?>
+<!--<link href="<?php echo $protocol ?>://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/themes/smoothness/jquery-ui.css" rel="stylesheet" />
+<script type="text/javascript" src="<?php echo $currentStore . 'frontend/base/default/eparcel/js/jquery-1.11.0.min.js'; ?>"></script>
+<script src="<?php echo $protocol ?>://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>-->
+<script>
+    require([
+        'jquery',
+        'jquery/ui',
+    ], function ($) {
+        $jEparcel = jQuery.noConflict();
+        $jEparcel(document).ready(function () {
+
+            $jEparcel("#dialog").dialog({
+                autoOpen: false,
+                width: '400px'
+            });
+
+            $jEparcel("#dialog2").dialog({
+                autoOpen: false,
+                width: '400px'
+            });
+
+            $jEparcel("#dialog_submit").click(function (e) {
+                if (!$jEparcel("#dialog_checkbox").prop('checked'))
+                {
+                    alert('Please acknowledge to submit test manifest');
+                    e.preventDefault();
+                }
+            });
+
+            $jEparcel('.print_label').click(function () {
+                var consignmentNumber = $jEparcel(this).attr('lang');
+                var ajaxCaller = '<?php echo $this->getUrl('ausposteParcel/index/updateLabelAsPrinted/') ?>consignmentNumber/' + consignmentNumber;
+                $jEparcel.ajax({
+                    type: "POST",
+                    url: ajaxCaller,
+                    success: function (data) {
+                        location.href = location.href;
+                    }
+                });
+            });
+
+            $jEparcel('.print_return_label').click(function () {
+                if (!$jEparcel(this).hasClass('printed'))
+                {
+                    var consignmentNumber = $jEparcel(this).attr('lang');
+                    var ajaxCaller = '<?php echo $this->getUrl('ausposteParcel/index/updateReturnLabelAsPrinted/') ?>consignmentNumber/' + consignmentNumber;
+                    $jEparcel.ajax({
+                        type: "POST",
+                        url: ajaxCaller,
+                        success: function (data) {
+                            location.href = location.href;
+                        }
+                    });
+                }
+            });
+
+            $jEparcel('ul#nav li.level0').each(function () {
+                var element = $jEparcel(this);
+                var topMenu = element.find('a span').html();
+                /*if(topMenu == 'Auspost eParcel Management')
+                 {
+                 var lastItem = element.find('ul li.level1:last');
+                 var newItem = lastItem.clone();
+                 newItem.removeClass('parent');
+                 newItem.find('ul').remove();
+                 var newItemLink = newItem.find('a');
+                 newItemLink.attr('href','http://www.linksync.com/help/eparcel-magento');
+                 newItemLink.attr('target','_blank');
+                 newItemLink.removeAttr('onclick');
+                 newItemLink.find('span').html('Help');
+                 lastItem.parent().append(newItem);
+                 lastItem.removeClass('last');
+                 var lastItemLink = element.find('ul li.level2:last').find('a').attr('href');
+                 element.find('ul li.level2:last').find('a').attr('href',lastItemLink+'#carriers_ausposteParcel-head');
+                 }*/
+            });
+
+            $jEparcel('.consignment-ui-hide').parent().hide();
+            $jEparcel('.consignment-ui-hide').css('width', '140px');
+            $jEparcel('.consignment-ui-hide').css('margin', '4px 0');
+            $jEparcel('#edit_default_consignment').css('width', '140px');
+            $jEparcel('#edit_default_consignment').css('margin', '4px 0');
+            $jEparcel('.articles_type-ui').css('margin', '4px 0');
+            //$jEparcel('#edit_default_consignment').parent().hide();
+            $jEparcel('#order_consignment_massaction > table').css('height', 'auto');
+
+        });
+    });
+    var redirectUrl = '';
+    function setLocationConfirmDialogNew(url)
+    {
+        redirectUrl = url;
+        if (!$jEparcel('#despatchManifest').hasClass('disabled'))
+        {
+<?php
+$operationMode = $block->getValue('carriers/ausposteParcel/operationMode');
+?>
+            var mode = '<?php echo $operationMode ?>';
+            if (mode == 1)
+            {
+                $jEparcel("#dialog_submit2").attr('href', redirectUrl);
+                $jEparcel("#dialog2").dialog("open");
+            } else
+            {
+                $jEparcel("#dialog_submit").attr('href', redirectUrl);
+                $jEparcel("#dialog").dialog("open");
+            }
+        }
+    }
+
+    function editdefaultconsignment(element)
+    {
+        if ($jEparcel('#edit_default_consignment').val() == 1)
+        {
+            $jEparcel('.consignment-ui-hide').parent().show();
+        } else
+        {
+            $jEparcel('.consignment-ui-hide').parent().hide();
+        }
+    }
+</script>
+<div id="dialog" title="Submit Test Manifest" style="display:none">
+    <form id="dialogform" method="post">
+        <p>You are in test mode. Test mode enables you to use and test all features of the Biztech Auspost eParcel without actually submitting a manifest to Australia Post on despatch of a manifest.</p>
+        <label> <input id="dialog_checkbox" name="dialog_checkbox" type="checkbox"> I acknowledge this is only a test. </label>
+        <br /><br /><br/>
+        <a
+            class="button" 
+            type="button" 
+            title="Submit"
+            id="dialog_submit"
+            href="#"
+            >
+            <span><span><span>Submit</span></span></span>
+        </a>
+    </form>
+</div>
+
+<div id="dialog2" title="Submit Manifest" style="display:none">
+    <form id="dialogform2" method="post">
+        <p>You are about to submit your manifest to Australia Post. Once your manifest is despatched, you won't be able to modify it, or the associated consignment.</p>
+        <br /><br/>
+        <a 
+            class="button" 
+            type="button" 
+            title="Submit"
+            id="dialog_submit2"
+            href="#"
+            >
+            <span><span><span>Submit</span></span></span>
+        </a>
+    </form>
+</div>

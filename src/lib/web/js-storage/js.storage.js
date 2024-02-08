@@ -14,7 +14,7 @@
 (function (factory) {
     var registeredInModuleLoader = false;
     if (typeof define === 'function' && define.amd) {
-        define(['jquery', 'jquery/jquery.cookie'], factory);
+        define(['jquery', 'js-cookie/cookie-wrapper'], factory);
         registeredInModuleLoader = true;
     }
     if (typeof exports === 'object') {

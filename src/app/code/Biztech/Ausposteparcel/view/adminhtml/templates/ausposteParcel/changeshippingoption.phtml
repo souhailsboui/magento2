@@ -1,0 +1,26 @@
+<?php
+$infoHelper = $this->callhelper();
+?>
+<div class="box">
+    <form name="edit_form3" id="edit_form3" method="post" action="<?php echo $this->getUrl('biztech_ausposteparcel/consignment/changeshipping'); ?>">
+        <?php echo $this->getBlockHtml('formkey') ?>
+        <input id="order_id" type="hidden" name="order_id" value="<?php echo $this->getOrderId() ?>" />
+        Select Shipping Option&nbsp;&nbsp; 
+        <select id="ausposteParcel_shipping_option" name="ausposteParcel_shipping_option" style="padding:3px" >
+            <option value="">Please select</option>
+            <?php
+            $options = $infoHelper->getEparcelShippingOptions($this->getOrder()->getShippingMethod(), $this->getOrder()->getShippingDescription());
+            foreach ($options as $method => $option) {
+                ?>
+                <option value="<?php echo $method ?>">
+                    <?php echo $option ?>
+                </option>
+                <?php
+            }
+            ?>
+
+        </select>
+        <button style="" onclick="return submitForm3(<?php echo $this->getOrderId() ?>)" class="scalable save submit-button" type="button" title="Submit"><span><span><span>Change</span></span></span></button>
+    </form>
+</div>
+<div class="clear"></div>
