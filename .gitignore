@@ -75,3 +75,5 @@
 !/src/generated/.htaccess
 # /src/auth.json
 .DS_Store
+
+/.vscode
